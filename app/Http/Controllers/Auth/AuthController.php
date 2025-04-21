@@ -44,10 +44,22 @@ class AuthController extends Controller
 
     public function logout(Request $request)
     {
-        $request->user()->currentAccessToken()->delete();
+        try {
+            if (!$request->user()) {
+                return response()->json([
+                    'message' => 'Usuario no autenticado'
+                ], 401); // 401 = Unauthorized
+            }
 
-        return response()->json([
-            'message' => 'Sesión cerrada exitosamente'
-        ]);
+            $request->user()->tokens()->delete();
+
+            return response()->json([
+                'message' => 'Sesión cerrada exitosamente'
+            ]);
+        } catch (\Throwable $th) {
+            return response()->json([
+                "error" => "Se generó un error: " . $th->getMessage(),
+            ], 500);
+        }
     }
 }
