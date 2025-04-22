@@ -13,12 +13,12 @@ return new class extends Migration
     {
         Schema::create('inputs', function (Blueprint $table) {
             $table->id();
-            $table->string('InputName',80);
-            $table->string('UnitMeasurement',10);
+            $table->string('InputName', 80);
+            $table->string('UnitMeasurement', 10);
             $table->integer('InitialQuantity');
-            $table->integer('CurrenStock');
-            $table->string('UnitMeasurementGrams',2);
-            $table->double('UnitePrice',10,3);
+            $table->integer('CurrentStock');
+            $table->string('UnitMeasurementGrams', 2);
+            $table->double('UnityPrice', 10, 3);
             $table->timestamps();
         });
     }
