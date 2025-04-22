@@ -1,10 +1,11 @@
 <?php
-
-use App\Http\Controllers\Auth\AuthController;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\CrudController;
 
-Route::post('/login', [AuthController::class, 'login']);
-Route::middleware('auth:sanctum')->group(function () {
-    Route::post('/logout', [AuthController::class, 'logout']);
-    Route::get('/user', [AuthController::class, 'user']);
+Route::prefix('crud')->group(function () {
+    Route::get('{tabla}', [CrudController::class, 'index']);
+    Route::get('{tabla}/{id}', [CrudController::class, 'show']);
+    Route::post('{tabla}', [CrudController::class, 'store']);
+    Route::put('{tabla}/{id}', [CrudController::class, 'update']);
+    Route::delete('{tabla}/{id}', [CrudController::class, 'destroy']);
 });

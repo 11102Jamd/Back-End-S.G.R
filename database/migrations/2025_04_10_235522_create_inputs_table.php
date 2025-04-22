@@ -16,9 +16,9 @@ return new class extends Migration
             $table->string('InputName',80);
             $table->string('UnitMeasurement',10);
             $table->integer('InitialQuantity');
-            $table->integer('CurrenStock');
+            $table->integer('CurrentStock');
             $table->string('UnitMeasurementGrams',2);
-            $table->double('UnitePrice',10,3);
+            $table->double('UnityPrice',10,3);
             $table->timestamps();
         });
     }
