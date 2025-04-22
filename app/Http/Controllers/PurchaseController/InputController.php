@@ -20,5 +20,5 @@ class InputController extends BaseCrudController
         'UnityPrice' => 'required|numeric|min:0'
     ];
 
-    
+
 }
