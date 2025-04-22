@@ -14,7 +14,7 @@ class Inputs extends Model
         'UnitMeasurement',
         'CurrentStock',
         'UnitMeasurementGrams',
-        'UnityPrice'
+        'UnitePrice'
     ];
 
     public function InputOrders()
