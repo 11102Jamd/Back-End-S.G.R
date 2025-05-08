@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Auth\AuthController;
+use App\Http\Controllers\Fabricacion\ManufacturingController;
 use App\Http\Controllers\PurchaseController\InputController;
 use Illuminate\Support\Facades\Route;
 
@@ -11,3 +12,4 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::apiResource('inputs', InputController::class);
 
 });
+Route::apiResource('manufacturing', ManufacturingController::class);
