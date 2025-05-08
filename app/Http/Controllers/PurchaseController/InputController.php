@@ -12,10 +12,6 @@ class InputController extends BaseCrudController
     //
     protected $model = Inputs::class;
     protected $validationRules = [
-    'InputName' => 'required|string|max:50',
-        'InitialQuantity' => 'required|integer|max:10|min:1',
-        'UnitMeasurement' => 'required|string|max:2|min:1',
-        'CurrentStock' => 'required|integer|min:1',
-        'UnitMeasurementGrams' => 'required|string|max:1',
-        'UnityPrice' => 'required|numeric|min:0'
-    ];}
+        'InputName' => 'required|string|max:50',
+    ];
+}

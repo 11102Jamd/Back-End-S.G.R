@@ -19,6 +19,14 @@ class Inputs extends Model
         'UnityPrice'
     ];
 
+    protected $attributes = [
+        'InitialQuantity' =>0,
+        'UnitMeasurement' =>'g',
+        'CurrentStock' =>0,
+        'UnitMeasurementGrams' =>'g',
+        'UnityPrice'=>0
+    ];
+
     public function InputOrders()
     {
         return $this->hasMany(InputOrder::class);
@@ -78,7 +86,7 @@ class Inputs extends Model
     }
 
     //Metodo para agregar la entradas
-    public function registrarEntradas(array $entradas)
+    public function registerInputs(array $entradas)
     {
         DB::beginTransaction();
 
