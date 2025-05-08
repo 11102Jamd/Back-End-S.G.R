@@ -18,7 +18,4 @@ class InputController extends BaseCrudController
         'CurrentStock' => 'required|integer|min:1',
         'UnitMeasurementGrams' => 'required|string|max:1',
         'UnityPrice' => 'required|numeric|min:0'
-    ];
-
-
-}
+    ];}
