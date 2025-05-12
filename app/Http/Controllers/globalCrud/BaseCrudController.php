@@ -71,8 +71,7 @@ class BaseCrudController extends Controller
     }
 
     public function destroy($id){
-        try {
-            //code...
+        try {        
             $record = $this->model::findOrFail($id);
             $record->delete();
             return response()->json('Registro Eliminado Exitosamente');

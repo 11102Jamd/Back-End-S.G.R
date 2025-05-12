@@ -14,4 +14,13 @@ class InputController extends BaseCrudController
     protected $validationRules = [
         'InputName' => 'required|string|max:50',
     ];
+
+    public function index()
+    {
+        $inputs = Inputs::with(['input_order' => function ($search) {
+            $search->latest()->take(1);
+        }])->orderBy('id', 'desc')->get();
+
+        return response()->json($inputs);
+    }
 }

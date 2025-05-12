@@ -33,7 +33,7 @@ class PurchaseOrder extends Model
         $items = [];
         $total = 0;
 
-        foreach ($inputs as $item) {
+        foreach ($inputs as $items) {
             try {
                 $input = Inputs::findOrFail($items['ID_Input']);
                 $grams = $input->ConvertUnit($items['UnitMeasurement'], $items['InitialQuantity']);
