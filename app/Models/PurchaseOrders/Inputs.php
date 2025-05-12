@@ -54,6 +54,7 @@ class Inputs extends Model
             throw new \InvalidArgumentException('El valor debe ser numérico');
         }
 
+        //Verifica la unidad digitada y dependiendo el caso hace la operacion respectiva.
         switch ($unit) {
             case 'kg':
                 return $quantity * 1000;
