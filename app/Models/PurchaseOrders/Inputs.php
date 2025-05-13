@@ -13,6 +13,8 @@ class Inputs extends Model
 {
     //
     protected $table = 'inputs';
+
+    // coregir porfa las propiedades para que esten en la tabla intermedia
     protected $fillable = [
         'InputName',
         'InitialQuantity',
