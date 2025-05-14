@@ -63,23 +63,6 @@ class Inputs extends Model
             default:
                 throw new \InvalidArgumentException('La unidad no puede ser reconocida. Digite la cantidad en "kg" o "lb". ', 1);
         }
-
-        /*try {
-            switch ($unit) {
-                case 'kg':
-                    return  $quantity * 1000;
-                case 'lb':
-                    return $quantity * 453.593;
-                default:
-                    return $unit;
-            }
-
-        } catch (\Throwable $th) {
-            return response()->json([
-                'error' => 'Unidad No identidicada, Por favor Digite Kg o Lb, unidades de medida validas.',
-                'message' => $th->getMessage(),
-            ], 422);
-        }*/
     }
 }
 

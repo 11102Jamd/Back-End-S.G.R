@@ -28,4 +28,5 @@ class InputController extends BaseCrudController
         //Devuelve por parametro los inputs en formato json
         return response()->json($inputs);
     }
+    
 }
