@@ -2,7 +2,8 @@
 
 namespace App\Models\Order;
 
-use App\Models\Fabricacion\Manufacturing;
+use App\Models\Manufacturing;
+//use App\Models\Fabricacion\Manufacturing;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
@@ -17,9 +18,9 @@ class Product extends Model
         'UnityPrice'
     ];
 
-    public function manufacturings(): HasMany
+    public function manufacturing(): HasMany
     {
-        return $this->hasMany(Manufacturing::class);
+        return $this->hasMany(Manufacturing::class, 'ID_product');
     }
 
     // public function orderDetails(): HasMany
