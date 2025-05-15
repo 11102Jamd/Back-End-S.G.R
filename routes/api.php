@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Auth\AuthController;
+use App\Http\Controllers\Order\ProductController;
 use App\Http\Controllers\PurchaseController\InputController;
 use Illuminate\Support\Facades\Request;
 use Illuminate\Support\Facades\Route;
@@ -20,3 +21,5 @@ Route::middleware('auth:sanctum')->group(function () {
     });
 
 });
+
+Route::apiResource('product', ProductController::class);
