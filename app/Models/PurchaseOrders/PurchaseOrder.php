@@ -25,4 +25,37 @@ class PurchaseOrder extends Model
     {
         return $this->hasMany(InputOrder::class);
     }
+
+    //Metodo que recibe un arreglo que contiene  los insumos
+    public function InputsReceived(array $inputs)
+    {
+
+        $items = [];
+        $total = 0;
+
+        foreach ($inputs as $item) {
+            try {
+                $input = Inputs::findOrFail($items['ID_Input']);
+                $grams = $input->ConvertUnit($items['UnitMeasurement'], $items['InitialQuantity']);
+                $subTotal = $items['InitialQuantity'] * $items['UnityPrice'];
+                $input->increment('CurrentStock', $grams);
+                $inputOrder = $this->InputOrders()->create([
+                    'ID_input' => $input->id,
+                    'PriceQuantity' => $subTotal
+                ]);
+                $total += $subTotal;
+                $items[]=$inputOrder;
+
+            } catch (\Throwable $th) {
+                //throw $th;
+                return $th->getMessage();
+            }
+        }
+        $this->PurchaseTotal=$total;
+        $this->save();
+        return response()->json([
+            'Order'=> PurchaseOrder::with('InputOrders'),
+            'message'=>'Datos Guardados correctamente',
+        ],202);
+    }
 }

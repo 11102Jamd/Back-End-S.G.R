@@ -19,9 +19,13 @@ class User extends Authenticatable
      * @var list<string>
      */
     protected $fillable = [
-        'name',
+        'name1',
+        'name2',
+        'surname1',
+        'surname2',
         'email',
         'password',
+        'rol'
     ];
 
     /**
@@ -45,5 +49,20 @@ class User extends Authenticatable
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
         ];
+    }
+
+    public function isAdmin(): bool
+    {
+        return $this->rol === 'Administrador';
+    }
+
+    public function isBaker(): bool
+    {
+        return $this->rol === 'Panadero';
+    }
+
+    public function isCashier(): bool
+    {
+        return $this->rol === 'Cajero';
     }
 }

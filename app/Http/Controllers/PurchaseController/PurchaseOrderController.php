@@ -4,14 +4,14 @@ namespace App\Http\Controllers\PurchaseController;
 
 use App\Http\Controllers\Controller;
 use App\Http\Controllers\globalCrud\BaseCrudController;
-use App\Models\PurchaseOrders\Inputs;
+use App\Models\PurchaseOrders\PurchaseOrder;
 use Illuminate\Http\Request;
 
-class InputController extends BaseCrudController
+class PurchaseOrderController extends BaseCrudController
 {
-    //
-    protected $model = Inputs::class;
+    protected $model = PurchaseOrder::class;
     protected $validationRules = [
-        'InputName' => 'required|string|max:50',
+        'PurchaseOrderDate',
+        'PurchaseTotal'
     ];
 }
