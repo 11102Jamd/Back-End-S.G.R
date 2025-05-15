@@ -1,14 +1,16 @@
 <?php
 namespace App\Http\Controllers\Fabricacion;
+namespace App\Models\Fabricacion;
 
-use App\Http\Controllers\Controller;
 use App\Http\Controllers\globalCrud\BaseCrudController;
+use App\Models\Manufacturing;
 use Illuminate\Http\Request;
-use App\Models\Fabricacion\Manufacturing;
-use App\Models\Fabricacion\Recipes;
+
 
 class ManufacturingController extends BaseCrudController
 {
+    protected $model = Manufacturing::class;
+
     protected $validationRules = [
         'ID_product' => 'required|exists:product,id',
         'ManufacturingTime' => 'required',
@@ -21,24 +23,34 @@ class ManufacturingController extends BaseCrudController
         'recipes.*.UnitMeasurement' => 'required|string|max:10',
         'recipes.*.PriceQuantitySpent' => 'required|numeric',
     ];
+
     public function store(Request $request)
     {
+        try {
+            $validated = $this->validateRequest($request);
 
-        // Guardar fabricación
-        /*$manufacturing = Manufacturing::create([
-            'ID_product' => $validated['ID_product'],
-            'ManufacturingTime' => $validated['ManufacturingTime'],
-            'Labour' => $validated['Labour'],
-            'ManufactureProductG' => $validated['ManufactureProductG'],
-            'TotalCostProduction' => $validated['TotalCostProduction'],
-        ]);
+            $recipes = $validated['recipes'];
+            unset($validated['recipes']);
 
-        // Guardar recetas
-        foreach ($validated['recipes'] as $recipe) {
-            $manufacturing->recipes()->create($recipe);
+
+            $manufacturing = $this->model::create($validated);
+
+
+            foreach ($recipes as $recipe) {
+                $manufacturing->recipes()->create($recipe);
+            }
+
+            return response()->json([
+                'message' => 'Fabricación registrada con recetas',
+                'data' => $manufacturing->load('recipes')
+            ], 201);
+        } catch (\Throwable $th) {
+            return response()->json([
+                'error' => 'Error al registrar fabricación',
+                'message' => $th->getMessage()
+            ], 422);
         }
-
-        return response()->json(['message' => 'Fabricación registrada con recetas'], 201);*/
     }
-}
+    
 
+}
