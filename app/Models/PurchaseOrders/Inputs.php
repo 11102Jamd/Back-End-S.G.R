@@ -13,6 +13,8 @@ class Inputs extends Model
 {
     //
     protected $table = 'inputs';
+
+    //Son modificables con datos externos
     protected $fillable = [
         'InputName',
         'InitialQuantity',
@@ -22,17 +24,16 @@ class Inputs extends Model
         'UnityPrice'
     ];
 
+
+    //Si no se pasa un valor se le a=>signa por defecto
     protected $attributes = [
-        'InitialQuantity' => 0,
-        'UnitMeasurement' => 'g',
         'CurrentStock' => 0,
         'UnitMeasurementGrams' => 'g',
-        'UnityPrice' => 0
     ];
 
     public function inputOrders(): HasMany
     {
-        return $this->hasMany(InputOrder::class, 'ID_input');
+        return $this->hasMany(InputOrder::class,'ID_input');
     }
 
     public function recipes()
@@ -44,15 +45,10 @@ class Inputs extends Model
     //Metodo que convierte la unidad de medida.
     public function convertUnit($unit, $quantity)
     {
-
-        //pasa las unidades de medida a minusculas.
-        $unit = strtolower($unit);
-
         //Validar los datos ingresados.
-
-        if (!is_numeric($quantity)) {
+        /*if (!is_numeric($quantity)) {
             throw new \InvalidArgumentException('El valor debe ser numérico');
-        }
+        }*/
 
         //Verifica la unidad digitada y dependiendo el caso hace la operacion respectiva.
         switch ($unit) {
@@ -61,7 +57,7 @@ class Inputs extends Model
             case 'lb':
                 return $quantity * 453.593;
             default:
-                throw new \InvalidArgumentException('La unidad no puede ser reconocida. Digite la cantidad en "kg" o "lb". ', 1);
+                return $quantity;
         }
     }
 }

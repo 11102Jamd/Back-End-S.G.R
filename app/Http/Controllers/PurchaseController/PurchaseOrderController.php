@@ -7,27 +7,30 @@ use App\Http\Controllers\globalCrud\BaseCrudController;
 use App\Models\PurchaseOrders\PurchaseOrder;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\DB;
 
 
 class PurchaseOrderController extends BaseCrudController
 {
     protected $model = PurchaseOrder::class;
     protected $validationRules = [
-        'ID_supplier' => 'required|exists:supplier,id',
+        'ID_supplier' => 'nullable|exists:supplier,id',
         'PurchaseOrderDate' => 'required|date',
-        'ID_input' => 'required|exists:inputs,id',
-        'UnitMeasurement' => 'required|string',
-        'InitialQuantity' => 'required|numeric|min:0',
-        'UnityPrice' => 'required|numeric'
+        'inputs' => 'required|array|min:1',
+        'inputs.*.ID_input' => 'nullable|exists:inputs,id',
+        'inputs.*.InitialQuantity' => 'required|numeric|min:0',
+        'inputs.*.UnitMeasurement' => 'required|string|in:g,Kg,lb',
+        'inputs.*.UnityPrice' => 'required|numeric|min:0'
     ];
 
     public function __construct(
-        protected PurchaseOrder $purchaseOrder){ 
-    }
+        protected PurchaseOrder $purchaseOrder
+    ) {}
 
     //sobre escribir el metodo store del crud, porque una orden de compra puede tener muchos insumos.
     public function store(Request $request)
     {
+        DB::beginTransaction();
         try {
             // Validación de entrada
             $validationRules = $this->validateRequest($request);
@@ -35,34 +38,20 @@ class PurchaseOrderController extends BaseCrudController
             // Procesamiento de la orden
             $result = $this->purchaseOrder->orderWithInputs($validationRules);
 
+            DB::commit();
             // Respuesta exitosa
             return response()->json([
-                'success' => true,
-                'message' => 'Orden de compra generada con éxito',
-                'data' => [
-                    'order' => $result['order'],
-                    'inputs' => $result['input_order']
-                ]
+                'Message' => "Orden de compra creada con exito",
+                'OrdenCompra' => $result['order'],
+                'Insumos' => $result['input_orders']
             ], 201);
-        } catch (\Illuminate\Validation\ValidationException $e) {
-            // Manejo específico para errores de validación
+        } catch (\Throwable $th) {
+            DB::rollBack();
+            Log::error("Error en el controlador" . $th->getMessage());
             return response()->json([
-                'success' => false,
-                'error' => 'Error de validación',
-                'messages' => $e->validator->errors()->all()
+                'error' => 'Datos inválidos',
+                'message' => $th->getMessage(),
             ], 422);
-        } catch (\Exception $e) {
-            // Manejo de otros errores
-            Log::error('Error al crear orden de compra: ' . $e->getMessage(), [
-                'exception' => $e,
-                'request' => $request->all()
-            ]);
-
-            return response()->json([
-                'success' => false,
-                'error' => 'Error al procesar la orden',
-                'message' => 'Ocurrió un error inesperado. Por favor, intente nuevamente.'
-            ], 500);
         }
     }
 }
