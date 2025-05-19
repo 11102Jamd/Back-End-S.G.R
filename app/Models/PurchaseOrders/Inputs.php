@@ -27,8 +27,11 @@ class Inputs extends Model
 
     //Si no se pasa un valor se le a=>signa por defecto
     protected $attributes = [
-        'CurrentStock' => 0,
-        'UnitMeasurementGrams' => 'g',
+        'InitialQuantity'=>0,
+        'UnitMeasurement'=>'g',
+        'CurrentStock'=>0,
+        'UnitMeasurementGrams'=>'g',
+        'UnityPrice'=>0
     ];
 
     public function inputOrders(): HasMany

@@ -9,7 +9,7 @@ use App\Models\PurchaseOrders\InputOrder;
 class PurchaseOrder extends Model
 {
     //creo que no es necesario porque leyendo la dc dice que si el nombre es el mismo no hay necesidad de otra vez repetir el nombre eloquent lo añade por defecto
-    //protected $table = 'purchase_order';
+    protected $table = 'purchase_order';
 
     protected $fillable = [
         'ID_supplier',
