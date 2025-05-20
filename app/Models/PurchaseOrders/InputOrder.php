@@ -15,7 +15,17 @@ class InputOrder extends Model
     protected $fillable = [
         'ID_purchase_order',
         'ID_input',
-        'PriceQuantity'
+        'PriceQuantity',
+        'InitialQuantity',
+        'UnitMeasurement',
+        'UnityPrice'
+    ];
+
+    protected $attributes = [
+        'PriceQuantity' => 0,
+        'InitialQuantity' => 0,
+        'UnitMeasurement' => 'g',
+        'UnityPrice' => 0
     ];
 
     //Creamos los metodos para relacionar las tablas a trabajar con su respectivo ID
@@ -28,5 +38,5 @@ class InputOrder extends Model
     public function purchaseOrder():BelongsTo
     {
         return $this->belongsTo(PurchaseOrder::class,'ID_purchase_order');
-    }
+    }    
 }

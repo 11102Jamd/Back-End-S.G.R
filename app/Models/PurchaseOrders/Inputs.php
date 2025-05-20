@@ -16,22 +16,15 @@ class Inputs extends Model
 
     //Son modificables con datos externos
     protected $fillable = [
-        'InputName',
-        'InitialQuantity',
-        'UnitMeasurement',
+        'InputName',   
         'CurrentStock',
         'UnitMeasurementGrams',
-        'UnityPrice'
     ];
-
-
+    
     //Si no se pasa un valor se le a=>signa por defecto
     protected $attributes = [
-        'InitialQuantity'=>0,
-        'UnitMeasurement'=>'g',
         'CurrentStock'=>0,
         'UnitMeasurementGrams'=>'g',
-        'UnityPrice'=>0
     ];
 
     public function inputOrders(): HasMany
@@ -49,9 +42,9 @@ class Inputs extends Model
     public function convertUnit($unit, $quantity)
     {
         //Validar los datos ingresados.
-        /*if (!is_numeric($quantity)) {
+        if (!is_numeric($quantity)) {
             throw new \InvalidArgumentException('El valor debe ser numérico');
-        }*/
+        }
 
         //Verifica la unidad digitada y dependiendo el caso hace la operacion respectiva.
         switch ($unit) {

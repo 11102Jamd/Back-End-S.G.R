@@ -6,9 +6,9 @@ use Illuminate\Database\Eloquent\Model;
 use App\Models\PurchaseOrders\Supplier;
 use App\Models\PurchaseOrders\InputOrder;
 
+
 class PurchaseOrder extends Model
 {
-    //creo que no es necesario porque leyendo la dc dice que si el nombre es el mismo no hay necesidad de otra vez repetir el nombre eloquent lo añade por defecto
     protected $table = 'purchase_order';
 
     protected $fillable = [
@@ -32,53 +32,43 @@ class PurchaseOrder extends Model
         return $this->hasMany(InputOrder::class, 'ID_purchase_order');
     }
 
-    /*el Insumo, su nombre, su cantidad, su unidad de medida, su precio por unidad, el
-total x la cantidad y finalmente el total a pagar en la orden de compra.*/
 
-    //Metodo que recibe un arreglo que contiene  los insumos
-    public function inputsReceived(array $inputsDates)
+
+    public function addInputs(array $inputs)
     {
-
-        $newOrders = [];
         $total = 0;
+        $createdInputOrders = [];
 
-        foreach ($inputsDates as $inputDate) {
+        foreach ($inputs as $inputData) {
+            $input = Inputs::findOrFail($inputData['ID_input']);
 
-            //
-            $input = Inputs::findOrFail($inputDate['ID_input']);
-
-            //
-            $grams = $input->converUnit(
-                $inputDate['IinitialQuantity'],
-                $inputDate['UnitMeasurement']
+            $grams = $input->convertUnit(
+                
+                $inputData['UnitMeasurement'],
+                $inputData['InitialQuantity']
             );
 
-            //
-            $subTotal = $inputDate['InitialQuantity'] * $inputDate['UnityPrice'];
+            $subtotal = $inputData['InitialQuantity'] * $inputData['UnityPrice'];
 
-            //
-            $input->increment('currentStock', $grams);
+            $input->increment('CurrentStock', $grams);
 
-            //
             $inputOrder = $this->inputOrders()->create([
                 'ID_input' => $input->id,
-                'PriceQuantity' => $subTotal,
-                'InitialQuantity' => $inputDate['InitialQuantity'],
-                'UnitMeasurement' => $inputDate['UnitMeasurement'],
-                'UnityPrice' => $inputDate['UnityPrice']
-            ]);
-
-            //
-            $total = $subTotal;
-            //
-            $newOrders[] = $inputOrder;
+                'PriceQuantity' => $subtotal,                
+                'UnitMeasurement' => $inputData['UnitMeasurement'],
+                'InitialQuantity' => $inputData['InitialQuantity'],
+                'UnityPrice' => $inputData['UnityPrice']
+            ]);            
+            $total += $subtotal;
+            $createdInputOrders[] = $inputOrder;
         }
+
         $this->PurchaseTotal = $total;
         $this->save();
 
         return [
-            'order' => $this->fresh()->load('inputOrders.input'),
-            'input_orders' => $newOrders
+            'order' =>  $this->fresh()->load('inputOrders.input'),
+            'input_orders' => $createdInputOrders
         ];
     }
 }
