@@ -5,7 +5,6 @@ use App\Http\Controllers\Order\ProductController;
 use App\Http\Controllers\PurchaseController\InputController;
 use Illuminate\Support\Facades\Request;
 use App\Http\Controllers\Fabricacion\ManufacturingController;
-use App\Http\Controllers\PurchaseController\InputController;
 use App\Http\Controllers\PurchaseController\PurchaseOrderController;
 use App\Http\Controllers\PurchaseController\SupplierController;
 use App\Models\PurchaseOrders\Inputs;
