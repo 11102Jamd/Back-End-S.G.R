@@ -15,7 +15,7 @@ return new class extends Migration
             $table->id();
             $table->foreignId('ID_supplier')->constrained('supplier')->cascadeOnDelete()->cascadeOnUpdate();
             $table->date('PurchaseOrderDate');
-            $table->decimal('PurchaseTotal',10,3);
+            $table->double('PurchaseTotal',10,3);
             $table->timestamps();
         });
     }

@@ -6,56 +6,69 @@ use Illuminate\Database\Eloquent\Model;
 use App\Models\PurchaseOrders\Supplier;
 use App\Models\PurchaseOrders\InputOrder;
 
+
 class PurchaseOrder extends Model
 {
-    //
     protected $table = 'purchase_order';
 
     protected $fillable = [
+        'ID_supplier',
         'PurchaseOrderDate',
         'PurchaseTotal'
     ];
 
-    public function Supplier()
+    protected $attributes = [
+        'PurchaseTotal' => 0
+    ];
+
+    public function supplier()
     {
         return $this->belongsTo(Supplier::class);
     }
 
-    public function InputOrders()
+    public function inputOrders()
     {
-        return $this->hasMany(InputOrder::class);
+        //comentariar
+        return $this->hasMany(InputOrder::class, 'ID_purchase_order');
     }
 
-    //Metodo que recibe un arreglo que contiene  los insumos
-    public function InputsReceived(array $inputs)
+
+
+    public function addInputs(array $inputs)
     {
-
-        $items = [];
         $total = 0;
+        $createdInputOrders = [];
 
-        foreach ($inputs as $item) {
-            try {
-                $input = Inputs::findOrFail($items['ID_Input']);
-                $grams = $input->ConvertUnit($items['UnitMeasurement'], $items['InitialQuantity']);
-                $subTotal = $items['InitialQuantity'] * $items['UnityPrice'];
-                $input->increment('CurrentStock', $grams);
-                $inputOrder = $this->InputOrders()->create([
-                    'ID_input' => $input->id,
-                    'PriceQuantity' => $subTotal
-                ]);
-                $total += $subTotal;
-                $items[]=$inputOrder;
+        foreach ($inputs as $inputData) {
+            $input = Inputs::findOrFail($inputData['ID_input']);
 
-            } catch (\Throwable $th) {
-                //throw $th;
-                return $th->getMessage();
-            }
+            $grams = $input->convertUnit(
+                
+                $inputData['UnitMeasurement'],
+                $inputData['InitialQuantity']
+            );
+
+            $subtotal = $inputData['InitialQuantity'] * $inputData['UnityPrice'];
+
+            $input->increment('CurrentStock', $grams);
+
+            $inputOrder = $this->inputOrders()->create([
+                'ID_input' => $input->id,
+                'PriceQuantity' => $subtotal,                
+                'UnitMeasurement' => $inputData['UnitMeasurement'],
+                'InitialQuantity' => $inputData['InitialQuantity'],
+                'UnityPrice' => $inputData['UnityPrice']
+            ]);            
+            $total += $subtotal;
+            $createdInputOrders[] = $inputOrder;
         }
-        $this->PurchaseTotal=$total;
+
+        $this->PurchaseTotal = $total;
         $this->save();
-        return response()->json([
-            'Order'=> PurchaseOrder::with('InputOrders'),
-            'message'=>'Datos Guardados correctamente',
-        ],202);
+
+        return [
+            'order' =>  $this->fresh()->load('inputOrders.input'),
+            'input_orders' => $createdInputOrders
+        ];
     }
 }

@@ -31,10 +31,11 @@ class AuthController extends Controller
             return response()->json([
                 'access_token' => $token,
                 'token_type' => 'Bearer',
-                'user' => $user
+                'user' => $user,
             ]);
 
             return response()->json(['csrf_token' => csrf_token()]);
+
         } catch (\Throwable $th) {
             return response()->json([
                 'message' => $th->getMessage(),

@@ -15,7 +15,10 @@ return new class extends Migration
             $table->id();
             $table->foreignId('ID_purchase_order')->constrained('purchase_order')->cascadeOnDelete()->cascadeOnUpdate();
             $table->foreignId('ID_input')->constrained('inputs')->cascadeOnDelete()->cascadeOnUpdate();
-            $table->decimal('PriceQuantity',10,3);
+            $table->double('InitialQuantity', 10, 3);
+            $table->string('UnitMeasurement', 10);
+            $table->double('PriceQuantity',10,3);
+            $table->double('UnityPrice',10,3);
             $table->timestamps();
         });
     }
