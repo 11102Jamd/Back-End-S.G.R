@@ -5,6 +5,7 @@ namespace App\Models\PurchaseOrders;
 use Illuminate\Database\Eloquent\Model;
 use App\Models\PurchaseOrders\Inputs;
 use App\Models\PurchaseOrders\PurchaseOrder;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class InputOrder extends Model
 {
@@ -14,16 +15,28 @@ class InputOrder extends Model
     protected $fillable = [
         'ID_purchase_order',
         'ID_input',
-        'PriceQuantity'
+        'PriceQuantity',
+        'InitialQuantity',
+        'UnitMeasurement',
+        'UnityPrice'
     ];
 
-    public function Input()
+    protected $attributes = [
+        'PriceQuantity' => 0,
+        'InitialQuantity' => 0,
+        'UnitMeasurement' => 'g',
+        'UnityPrice' => 0
+    ];
+
+    //Creamos los metodos para relacionar las tablas a trabajar con su respectivo ID
+    public function input():BelongsTo
     {
-        return $this->belongsTo(Inputs::class);
+        return $this->belongsTo(Inputs::class,'ID_input');
     }
 
-    public function PurchaseOrder()
+    //Metodo con el ID de la tabla pivote
+    public function purchaseOrder():BelongsTo
     {
-        return $this->belongsTo(PurchaseOrder::class);
-    }
+        return $this->belongsTo(PurchaseOrder::class,'ID_purchase_order');
+    }    
 }

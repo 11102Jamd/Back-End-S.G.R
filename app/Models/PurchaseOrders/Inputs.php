@@ -14,27 +14,22 @@ class Inputs extends Model
     //
     protected $table = 'inputs';
 
-    // coregir porfa las propiedades para que esten en la tabla intermedia
+    //Son modificables con datos externos
     protected $fillable = [
         'InputName',
-        'InitialQuantity',
-        'UnitMeasurement',
         'CurrentStock',
         'UnitMeasurementGrams',
-        'UnityPrice'
     ];
 
+    //Si no se pasa un valor se le a=>signa por defecto
     protected $attributes = [
-        'InitialQuantity' => 0,
-        'UnitMeasurement' => 'g',
-        'CurrentStock' => 0,
-        'UnitMeasurementGrams' => 'g',
-        'UnityPrice' => 0
+        'CurrentStock'=>0,
+        'UnitMeasurementGrams'=>'g',
     ];
 
     public function inputOrders(): HasMany
     {
-        return $this->hasMany(InputOrder::class, 'ID_input');
+        return $this->hasMany(InputOrder::class,'ID_input');
     }
 
     public function recipes()
@@ -46,12 +41,7 @@ class Inputs extends Model
     //Metodo que convierte la unidad de medida.
     public function convertUnit($unit, $quantity)
     {
-
-        //pasa las unidades de medida a minusculas.
-        $unit = strtolower($unit);
-
         //Validar los datos ingresados.
-
         if (!is_numeric($quantity)) {
             throw new \InvalidArgumentException('El valor debe ser numérico');
         }
@@ -63,25 +53,8 @@ class Inputs extends Model
             case 'lb':
                 return $quantity * 453.593;
             default:
-                throw new \InvalidArgumentException('La unidad no puede ser reconocida. Digite la cantidad en "kg" o "lb". ', 1);
+                return $quantity;
         }
-
-        /*try {
-            switch ($unit) {
-                case 'kg':
-                    return  $quantity * 1000;
-                case 'lb':
-                    return $quantity * 453.593;
-                default:
-                    return $unit;
-            }
-
-        } catch (\Throwable $th) {
-            return response()->json([
-                'error' => 'Unidad No identidicada, Por favor Digite Kg o Lb, unidades de medida validas.',
-                'message' => $th->getMessage(),
-            ], 422);
-        }*/
     }
 }
 
