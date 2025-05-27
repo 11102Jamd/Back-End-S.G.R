@@ -47,6 +47,7 @@ class BaseCrudController extends Controller
             $validateData = $this->validateRequest($request);
             $record = $this->model::create($validateData);
             return response()->json($record,201);
+
         } catch (\Throwable $th) {
             //throw $th;
             return response()->json([
@@ -91,5 +92,10 @@ class BaseCrudController extends Controller
         }
         return $request->validate($this->validationRules);
     }
+
+    protected function afterStore($record, $validated) {
+        // Por defecto no hace nada.
+    }
+
 
 }

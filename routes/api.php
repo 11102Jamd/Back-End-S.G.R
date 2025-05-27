@@ -1,12 +1,13 @@
 <?php
 
 use App\Http\Controllers\Auth\AuthController;
+use Illuminate\Support\Facades\Request;
+use App\Http\Controllers\ManufacturingController\ManufacturingController;
 use App\Http\Controllers\Order\ProductController;
 use App\Http\Controllers\PurchaseController\InputController;
-use Illuminate\Support\Facades\Request;
-use App\Http\Controllers\Fabricacion\ManufacturingController;
 use App\Http\Controllers\PurchaseController\PurchaseOrderController;
 use App\Http\Controllers\PurchaseController\SupplierController;
+use App\Models\Manufacturing\Manufacturing;
 use App\Models\PurchaseOrders\Inputs;
 use Illuminate\Support\Facades\Route;
 
@@ -26,7 +27,10 @@ Route::middleware('auth:sanctum')->group(function () {
 
 });
 
+
 Route::apiResource('manufacturing', ManufacturingController::class);
 Route::apiResource('inputs', InputController::class);
 Route::apiResource('purchaseorder', PurchaseOrderController::class);
 Route::apiResource('supplier', SupplierController::class);
+Route::apiResource('product', ProductController::class);
+
