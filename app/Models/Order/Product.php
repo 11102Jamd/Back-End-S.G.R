@@ -2,8 +2,10 @@
 
 namespace App\Models\Order;
 
-use App\Models\Manufacturing;
+
 //use App\Models\Fabricacion\Manufacturing;
+
+use App\Models\Manufacturing\Manufacturing;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 

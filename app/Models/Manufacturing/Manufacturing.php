@@ -1,8 +1,8 @@
 <?php
 
-namespace App\Models;
+namespace App\Models\Manufacturing;
 
-use App\Models\Fabricacion\Recipes;
+use App\Models\Order\Product;
 use App\Models\PurchaseOrders\Inputs;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -26,14 +26,14 @@ class Manufacturing extends Model
         'TotalCostProduction' => 0,
     ];
 
-    /*public function product(): BelongsTo
+    public function product(): BelongsTo
     {
         return $this->belongsTo(Product::class, 'ID_product');
-    }*/
+    }
 
     public function recipes(): HasMany
     {
-        return $this->hasMany(Recipes::class, 'ID_manufacturing');
+        return $this->hasMany(Recipe::class, 'ID_manufacturing');
     }
 
     public function calculateLabour(): self
@@ -47,7 +47,7 @@ class Manufacturing extends Model
         return $this;
     }
 
-    public function addIngredients(array $recipes): self
+    public function addIngredients(array $recipes): self//cual es el contexto de self en este caso?
     {
         $total = 0;
         $totalG = 0;
@@ -70,7 +70,7 @@ class Manufacturing extends Model
                 'UnitMeasurement' => 'g',
             ]);
 
-            $subtotal = $recipe->PriceQuantitySpent();
+            $subtotal = $recipe->calculatePriceSpent();
             $recipe->update(['PriceQuantitySpent' => $subtotal]);
 
             $input->decrement('CurrentStock', $amount);

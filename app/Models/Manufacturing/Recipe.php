@@ -1,14 +1,13 @@
 <?php
 
-namespace App\Models\Fabricacion;
+namespace App\Models\Manufacturing;
 
-use App\Models\Manufacturing;
+use App\Models\Manufacturing\Manufacturing;
 use App\Models\PurchaseOrders\Inputs;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
-
-class Recipes extends Model
+class Recipe extends Model
 {
     protected $table = 'recipe';
 
@@ -42,18 +41,27 @@ class Recipes extends Model
         });
     }
 
-    public function getGramsAttribute(): float
+    private function getGramsAttribute(float $amountGrams, string $orderUnit): float
     {
-        switch (strtolower($this->UnitMeasurement)) {
+        switch ($orderUnit) {
             case 'kg':
-                return $this->AmountSpent * 1000;
+                return $amountGrams / 1000;
             case 'lb':
-                return $this->AmountSpent / 453.592;
+                return $amountGrams / 453.592;
             case 'l':
-                return $this->AmountSpent * 1000; //  densidad del agua
+                return $amountGrams / 1000; //  densidad del agua
             default:
-                return $this->AmountSpent;
+                return $amountGrams;
         }
+    }
+
+
+
+    private function getPriceReference()
+    {
+        return $this->Input->inputOrders()->with(['purchaseOrder' => function ($query) {
+            $query->orderBy('PurchaseOrderDate', 'desc');
+        }])->first();
     }
 
     public function calculatePriceSpent(): float
@@ -62,17 +70,18 @@ class Recipes extends Model
         if (!$input) {
             throw new \Exception("El insumo asociado no existe.");
         }
-        // Obtener el primer inputOrder relacionado si existe, sino fallback al insumo
-        $inputOrder = $input->inputOrders()->first();
-        $unitPrice = $inputOrder->UnityPrice ?? $input->Price;
-        $unitQuantity = $inputOrder->UnitQuantity ?? $input->UnitQuantity ?? 1;
-        if ($unitQuantity <= 0) {
-            throw new \Exception("La cantidad unitaria debe ser mayor que cero.");
+        $inputOrder = $this->getPriceReference();
+
+        if (!$inputOrder) {
+            throw new \Exception("El insumo no esta abastecido");
         }
-        $pricePerGram = $unitPrice / $unitQuantity;
-        $totalPrice = $this->grams * $pricePerGram;
-        return round($totalPrice, 2);
+        $amountManufacturing =  $this->AmountSpent;
+        $amountManufacturing = $this->getGramsAttribute($this->AmountSpent, $inputOrder->UnitMeasurement);
+
+        $UnityPrice = $inputOrder->UnityPrice;
+        return round($amountManufacturing * $UnityPrice , 2);
     }
+
     public function restoreStockInputs(): void
     {
         $input = $this->Input;

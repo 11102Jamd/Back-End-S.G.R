@@ -1,11 +1,11 @@
 <?php
-namespace App\Http\Controllers\Fabricacion;
-namespace App\Models\Fabricacion;
 
+namespace App\Http\Controllers\ManufacturingController;
+
+use App\Http\Controllers\Controller;
 use App\Http\Controllers\globalCrud\BaseCrudController;
-use App\Models\Manufacturing;
+use App\Models\Manufacturing\Manufacturing;
 use Illuminate\Http\Request;
-
 
 class ManufacturingController extends BaseCrudController
 {
@@ -13,15 +13,11 @@ class ManufacturingController extends BaseCrudController
 
     protected $validationRules = [
         'ID_product' => 'required|exists:product,id',
-        'ManufacturingTime' => 'required',
-        'Labour' => 'required|integer',
-        'ManufactureProductG' => 'required|numeric',
-        'TotalCostProduction' => 'required|numeric',
-        'recipes' => 'required|array',
+        'ManufacturingTime' => 'required|integer|min:1',
+        'recipes' => 'required|array|min:1',
         'recipes.*.ID_inputs' => 'required|exists:inputs,id',
-        'recipes.*.AmountSpent' => 'required|numeric',
-        'recipes.*.UnitMeasurement' => 'required|string|max:10',
-        'recipes.*.PriceQuantitySpent' => 'required|numeric',
+        'recipes.*.AmountSpent' => 'required|numeric|min:0.01',
+        'recipes.*.UnitMeasurement' => 'required|string|in:g,kg,lb'
     ];
 
     public function store(Request $request)
@@ -51,6 +47,26 @@ class ManufacturingController extends BaseCrudController
             ], 422);
         }
     }
-    
 
+    public function destroy($id)
+    {
+        try {
+            $manufacturing = Manufacturing::with('recipes')->findOrFail($id);
+
+            foreach ($manufacturing->recipes as $recipe) {
+                $recipe->restoredStockInpunts();
+                $recipe->delete();
+            }
+            $manufacturing->delete();
+
+            return response()->json([
+                'message' => 'Fabricacion eleminidad y stock restaurado correctamente'
+            ]);
+        } catch (\Throwable $th) {
+            return response()->json([
+                'error' => 'Error al eliminar fabricacion',
+                'message' => $th->getMessage()
+            ], 422);
+        }
+    }
 }
