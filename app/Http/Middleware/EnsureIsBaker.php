@@ -17,6 +17,10 @@ class EnsureIsBaker
     {
         $user = $request->user();
 
+        if ($user && $user->isAdmin()) {
+            return $next($request);
+        }
+        
         if (!$user || !$user->isBaker()) {
             abort($user ? 403 : 401, $user ? 'Acceso solo para panaderos' : 'No autenticado');
         }
