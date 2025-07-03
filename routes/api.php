@@ -4,21 +4,28 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Auth\AuthController;
 use App\Http\Controllers\PurchaseController\InputController;
 use App\Http\Controllers\Order\ProductController;
+use App\Http\Controllers\Order\OrderController; // ← 👈 Aquí conectas el controlador de pedidos
 
 Route::post('/login', [AuthController::class, 'login']);
 
 Route::middleware('auth:sanctum')->group(function () {
 
-    // Rutas de autenticación
+    //  Rutas de autenticación
     Route::post('/logout', [AuthController::class, 'logout']);
     Route::get('/user', [AuthController::class, 'user']);
 
-    // CRUD para Insumos (Inputs)
+    //  CRUD para Insumos
     Route::apiResource('inputs', InputController::class);
 
-    // CRUD completo para Productos (antes Pedidos)
-    Route::apiResource('productos', ProductController::class);
+    //  CRUD completo para Productos
+    Route::apiResource('productos', OrderController::class);
 
-    // Ruta adicional para filtrar productos por fecha (ajusta el método si es necesario)
-    Route::post('productos/filtrar-fecha', [ProductController::class, 'filtrarPorFecha']);
+    //  Filtro por fecha para productos (si tu controlador lo tiene)
+    Route::post('productos/filtrar-fecha', [OrderController::class, 'filtrarPorFecha']);
+
+    //  CRUD para Pedidos (el verdadero OrderController heredando BaseCrudController)
+    Route::apiResource('pedidos', OrderController::class);
+
+    //  Filtro por fecha para pedidos (si agregaste el método)
+    Route::post('pedidos/filtrar-fecha', [OrderController::class, 'filtrarPorFecha']);
 });
