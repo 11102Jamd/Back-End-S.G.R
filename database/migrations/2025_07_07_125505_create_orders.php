@@ -13,6 +13,9 @@ return new class extends Migration
     {
         Schema::create('order', function (Blueprint $table) {
             $table->id();
+            $table->foreignId('ID_user')->constrained('users')->cascadeOnDelete()->cascadeOnUpdate();;
+            $table->dateTime('order_date');
+            $table->decimal('order_total', 10, 3);
             $table->timestamps();
         });
     }
@@ -22,6 +25,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('order');
+        Schema::dropIfExists('orders');
     }
 };
