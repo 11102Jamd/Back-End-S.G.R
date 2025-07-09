@@ -47,7 +47,7 @@ class Manufacturing extends Model
         return $this;
     }
 
-    public function addIngredients(array $recipes): self//cual es el contexto de self en este caso?
+    public function addIngredients(array $recipes): self
     {
         $total = 0;
         $totalG = 0;
