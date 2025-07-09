@@ -38,7 +38,7 @@ class Manufacturing extends Model
 
     public function calculateLabour(): self
     {
-        if ($this->ManufacturingTime > 0) {
+        if ($this->ManufacturingTime > 0 && $this->ManufacturingTime != 0) {
             $hours = $this->ManufacturingTime / 60;
             $this->Labour = $hours * 10000;
             $this->save();
@@ -79,10 +79,9 @@ class Manufacturing extends Model
             $totalG += $amount;
         }
 
-        $this->update([
-            'TotalCostProduction' => $total + $this->Labour,
-            'ManufactureProductG' => $totalG,
-        ]);
+        $this->TotalCostProduction = $total + $this->labour;
+        $this->ManufactureProductG = $totalG;
+        $this->save();
 
         return $this->fresh()->load('recipes.input');
     }
