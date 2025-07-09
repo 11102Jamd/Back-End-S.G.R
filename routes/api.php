@@ -7,11 +7,10 @@ use App\Http\Controllers\Order\ProductController;
 use App\Http\Controllers\PurchaseController\InputController;
 use App\Http\Controllers\PurchaseController\PurchaseOrderController;
 use App\Http\Controllers\PurchaseController\SupplierController;
-use App\Models\Manufacturing\Manufacturing;
-use App\Models\PurchaseOrders\Inputs;
 use Illuminate\Support\Facades\Route;
 
 Route::post('/login', [AuthController::class, 'login']);
+
 Route::middleware('auth:sanctum')->group(function () {
     Route::post('/logout', [AuthController::class, 'logout']);
     Route::get('/user', function (Request $request) {
