@@ -13,10 +13,10 @@ class Product extends Model
     protected $table = 'product' ;
 
     protected $fillable = [
-        'ProductName',
-        'InitialQuantity',
-        'CurrentStock',
-        'UnityPrice',
+        'productName',
+        'initialQuantity',
+        'currentStock',
+        'unityPrice',
     ];
     
     
@@ -24,13 +24,13 @@ class Product extends Model
 
     public function manufacturing(): HasMany
     {
-        return $this->hasMany(Manufacturing::class, 'ID_prodcuto');
+        return $this->hasMany(Manufacturing::class, 'ID_product');
     }
 
     // Se define que un producto puede estar en varios pedidos detalles de pedido y defino su relacion con el modelo OrderDetail
     public function orderDetail(): HasMany
     {
-        return $this->hasMany(OrderDetail::class, 'ID_prodcuto');
+        return $this->hasMany(OrderDetail::class, 'ID_prodcut');
     }
     
     // Aqui defino un accesor para obtener el precio formateado del producto
@@ -44,7 +44,7 @@ class Product extends Model
 
     public function getCurrentStockAttribute()
     {
-        return $this->InitialQuantity - $this->manufacturing->sum('Requestedquantity');
+        return $this->InitialQuantity - $this->manufacturing->sum('requestedQuantity');
     }
 
     // Aqui validamos que los datos cumplan con la Base de datos
@@ -53,9 +53,9 @@ class Product extends Model
     {
 
         return [
-        'ProductName' => 'required|string|max:50',
-        'InitialQuantity' => 'required|integer|min:0',
-        'UnityPrice' => 'required|numeric|min:0.01',
+        'productName' => 'required|string|max:50',
+        'initialQuantity' => 'required|integer|min:0',
+        'unityPrice' => 'required|numeric|min:0.01',
         ];
     }
 };
