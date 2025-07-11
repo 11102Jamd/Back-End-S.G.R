@@ -1,5 +1,5 @@
 <?php
-
+//
 namespace App\Models\Order;
 
 use Illuminate\Database\Eloquent\Model;
@@ -20,7 +20,7 @@ class Order extends Model
         'ID_user',
         'orderDate',
         'orderTotal',
-        
+
     ];
 
     protected $casts = [
@@ -28,64 +28,57 @@ class Order extends Model
         'orderTotal' => 'decimal:2',
     ];
 
-    // Relación: Un pedido tiene muchos detalles
+    // Relación con detalles de pedido y productos 
+    
     public function orderDetail(): HasMany
     {
         return $this->hasMany(OrderDetail::class, 'ID_order', 'ID_order');
     }
 
-    // Relación: Un pedido pertenece a un usuario
+    // Relación con usuario
     public function user(): BelongsTo
     {
         return $this->belongsTo(User::class, 'ID_user', 'ID_user');
     }
 
-    // Validación de los datos del pedido
+
     public static function validationRules($id = null): array
     {
         return [
             'ID_user' => 'required|exists:users,ID_user',
             'orderDate' => 'required|date|before_or_equal:today',
             'orderTotal' => 'required|numeric|min:0.01|max:999999.99',
-            
+
         ];
     }
 
-    // Scope para pedidos recientes
+
     public function scopeRecent($query, $days = 30)
     {
         return $query->where('orderDate', '>=', now()->subDays($days));
     }
 
-    /*
-    // Scope para filtrar por estado
-    public function scopeByStatus($query, $status)
-    {
-        return $query->where('status', $status);
-    }
-    */
-    
-    // Accessor para fecha formateada
+
     public function getFormattedDateAttribute()
     {
         return $this->orderDate ? $this->orderDate->format('d/m/Y H:i') : null;
     }
 
-    // Mutator para redondear el total
+
     public function setOrderTotalAttribute($value)
     {
         $this->attributes['orderTotal'] = round($value, 2);
     }
 
-    // Calcula el total sumando los detalles
+
     public function calculateTotal()
     {
-        return $this->orderDetails->sum(function($detail) {
-            return $detail->requestedQuantity * $detail->princeQuantity;
+        return $this->orderDetail->sum(function($detail) {
+            return $detail->requestedQuantity * $detail->priceQuantity;
         });
     }
 
-    // Eventos de modelo
+
     protected static function booted()
     {
         static::creating(function ($order) {
@@ -95,7 +88,7 @@ class Order extends Model
         });
 
         static::deleting(function ($order) {
-            $order->orderDetails()->delete();
+            $order->orderDetail()->delete();
         });
     }
 }

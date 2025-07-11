@@ -6,7 +6,7 @@ use App\Http\Controllers\Order\ProductController;
 use App\Http\Controllers\Order\OrderController; 
 
 Route::middleware('auth:sanctum')->group(function () {
-
+    //pedidos
     Route::prefix('orders')->group(function () {
         Route::get('/', [OrderController::class, 'index']);
         Route::post('/', [OrderController::class, 'store']);
@@ -24,7 +24,7 @@ Route::middleware('auth:sanctum')->group(function () {
             Route::delete('/{id}', [OrderDetailController::class, 'destroy']);
         });
     });
-
+        // Productos
     Route::prefix('products')->group(function () {
         Route::get('/', [ProductController::class, 'index']);
         Route::post('/', [ProductController::class, 'store']);

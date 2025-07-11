@@ -58,7 +58,7 @@ class OrderDetailController extends Controller
 
         DB::beginTransaction();
         try {
-            // Verificar existencia de pedido y producto
+
             $order = Order::find($validated['ID_order']);
             $product = Product::find($validated['ID_product']);
 
@@ -69,7 +69,7 @@ class OrderDetailController extends Controller
                 ], 404);
             }
 
-            // Verificar stock
+            
             if ($product->currentStock < $validated['requestedQuantity']) {
                 return response()->json([
                     'success' => false,
@@ -83,9 +83,9 @@ class OrderDetailController extends Controller
             DB::commit();
 
             Log::info('Detalle creado', [
-                'id' => $detail->id,
-                'order_id' => $order->id,
-                'product_id' => $product->id
+                'id' => $detail->ID_orderDetail,
+                'order_id' => $order->ID_order,
+                'product_id' => $product->ID_product
             ]);
 
             return response()->json([
@@ -120,7 +120,7 @@ class OrderDetailController extends Controller
                 ], 404);
             }
 
-            // Verificar stock (considerando la cantidad actual)
+            
             $quantityDifference = $validated['requestedQuantity'] - $detail->requestedQuantity;
             if ($product->currentStock < $quantityDifference) {
                 return response()->json([

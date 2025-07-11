@@ -10,14 +10,14 @@ use Illuminate\Support\Facades\Log;
 
 class ProductController extends Controller
 {
-    
+
     public function index(Request $request)
     {
         try {
-            $query = Product::with(['manufacturing', 'orderDetails'])
+            $query = Product::with(['manufacturing', 'orderDetails.order'])
                 ->latest();
 
-            // Filtros dinámicos
+
             if ($request->has('name')) {
                 $query->where('productName', 'like', '%'.$request->name.'%');
             }
@@ -50,11 +50,10 @@ class ProductController extends Controller
         }
     }
 
-    
     public function show($id)
     {
         try {
-            $product = Product::with(['manufacturing', 'orderDetails.order'])
+            $product = Product::with(['manufacturing', 'orderDetail.order'])
                 ->findOrFail($id);
 
             return response()->json([
@@ -71,7 +70,6 @@ class ProductController extends Controller
         }
     }
 
-    
     public function store(Request $request)
     {
         DB::beginTransaction();
@@ -83,7 +81,7 @@ class ProductController extends Controller
             DB::commit();
             
             Log::info('Producto creado', [
-                'id' => $product->id,
+                'id' => $product->ID_product,
                 'name' => $product->productName
             ]);
 
@@ -112,7 +110,6 @@ class ProductController extends Controller
         }
     }
 
-    
     public function update(Request $request, $id)
     {
         DB::beginTransaction();
@@ -149,7 +146,6 @@ class ProductController extends Controller
         }
     }
 
-    
     public function destroy($id)
     {
         DB::beginTransaction();
@@ -157,7 +153,7 @@ class ProductController extends Controller
             $product = Product::withCount(['orderDetails', 'manufacturing'])
                 ->findOrFail($id);
 
-            // Verificar si tiene relaciones dependientes
+
             if ($product->order_details_count > 0 || $product->manufacturing_count > 0) {
                 return response()->json([
                     'success' => false,
@@ -193,7 +189,6 @@ class ProductController extends Controller
         }
     }
 
-
     public function stock($id)
     {
         try {
@@ -204,7 +199,7 @@ class ProductController extends Controller
                 'current' => $product->currentStock,
                 'initial' => $product->initialQuantity,
                 'reserved' => $product->orderDetails->sum('requestedQuantity'),
-                'used_in_manufacturing' => $product->manufacturing->sum('ManufactureProductG')
+                'used_in_manufacturing' => $product->manufacturing->sum('quantity_used') // Verificar nombre correcto del campo
             ];
 
             return response()->json([

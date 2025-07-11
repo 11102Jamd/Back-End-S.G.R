@@ -10,7 +10,7 @@ use Illuminate\Support\Facades\Log;
 
 class OrderController extends Controller
 {
-    
+   
     public function index(Request $request)
     {
         try {
@@ -52,7 +52,8 @@ class OrderController extends Controller
     public function show($id)
     {
         try {
-            $order = Order::with(['user', 'orderDetail.product'])->findOrFail($id);
+            $order = Order::with(['user', 'orderDetail.product']) 
+                ->findOrFail($id);
             
             return response()->json([
                 'success' => true,
@@ -67,7 +68,6 @@ class OrderController extends Controller
         }
     }
 
-    
     public function store(Request $request)
     {
         $validated = $request->validate(Order::validationRules());
@@ -79,7 +79,7 @@ class OrderController extends Controller
             DB::commit();
             
             Log::info("Pedido creado exitosamente", [
-                'order_id' => $order->id,
+                'order_id' => $order->ID_order, 
                 'user_id' => $validated['ID_user'] ?? null
             ]);
             
@@ -104,7 +104,6 @@ class OrderController extends Controller
         }
     }
 
-    
     public function update(Request $request, $id)
     {
         DB::beginTransaction();
@@ -143,7 +142,6 @@ class OrderController extends Controller
         }
     }
 
-    
     public function destroy($id)
     {
         DB::beginTransaction();
