@@ -15,7 +15,7 @@ class OrderDetail extends Model{
         'ID_order',
         'ID_product',
         'requestedQuantity',
-        'princeQuantity',
+        'priceQuantity',
     ];
 
     // Define que OrderDetail pertenece a un Order
@@ -37,7 +37,7 @@ class OrderDetail extends Model{
     }  
 
     // Mutator para redondear el precio a dos decimales
-    public function setPrinceQuantityAttribute($value)
+    public function setPriceQuantityAttribute($value)
     {
         $this->attributes['princeQuantity'] = round($value, 2);
     }

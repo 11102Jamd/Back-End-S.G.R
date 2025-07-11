@@ -1,6 +1,7 @@
 <?php
 
 namespace App\Models\Order;
+
 use App\Models\Fabricacion\Manufacturing;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;

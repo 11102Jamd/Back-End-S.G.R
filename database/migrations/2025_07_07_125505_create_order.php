@@ -12,7 +12,7 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('order', function (Blueprint $table) {
-            $table->id();
+            $table->id('ID_order');
             $table->foreignId('ID_user')->constrained('users')->cascadeOnDelete()->cascadeOnUpdate();;
             $table->dateTime('orderDate');
             $table->decimal('orderTotal', 10, 3);
@@ -21,7 +21,7 @@ return new class extends Migration
     }
 
     /**
-     * Reverse the migrations.
+     * Reverse the migrations.  
      */
     public function down(): void
     {

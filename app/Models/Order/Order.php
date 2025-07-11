@@ -12,14 +12,13 @@ use App\Models\Order\OrderDetail;
 
 class Order extends Model
 {
-    
 
     protected $table = 'order';
     protected $primaryKey = 'ID_order';
 
     protected $fillable = [
         'ID_user',
-        'orderDdate',
+        'orderDate',
         'orderTotal',
         
     ];
@@ -30,7 +29,7 @@ class Order extends Model
     ];
 
     // Relación: Un pedido tiene muchos detalles
-    public function orderDetails(): HasMany
+    public function orderDetail(): HasMany
     {
         return $this->hasMany(OrderDetail::class, 'ID_order', 'ID_order');
     }
@@ -58,12 +57,14 @@ class Order extends Model
         return $query->where('orderDate', '>=', now()->subDays($days));
     }
 
+    /*
     // Scope para filtrar por estado
     public function scopeByStatus($query, $status)
     {
         return $query->where('status', $status);
     }
-
+    */
+    
     // Accessor para fecha formateada
     public function getFormattedDateAttribute()
     {
@@ -80,7 +81,7 @@ class Order extends Model
     public function calculateTotal()
     {
         return $this->orderDetails->sum(function($detail) {
-            return $detail->Requestedquantity * $detail->PrinceQuantity;
+            return $detail->requestedQuantity * $detail->princeQuantity;
         });
     }
 
