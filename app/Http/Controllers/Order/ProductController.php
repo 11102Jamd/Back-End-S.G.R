@@ -10,26 +10,55 @@ use Illuminate\Support\Facades\Log;
 
 class ProductController extends Controller
 {
+    // Reglas de validación para creación/actualización
+    protected function validationRules($id = null): array
+    {
+        return [
+            'product_name' => [
+                'required',
+                'string',
+                'max:50',
+                'unique:products,product_name,'.$id.',id' 
+            ],
+            'initial_quantity' => [
+                'required',
+                'integer',
+                'min:0' 
+            ],
+            'current_stock' => [
+                'sometimes', 
+                'integer',
+                'min:0',
+                'lte:initial_quantity' 
+            ],
+            'unit_price' => [
+                'required',
+                'numeric',
+                'min:0.01', 
+                'max:999999.99' 
+            ]
+        ];
+    }
 
+    // Listar todos los productos (con filtros opcionales)
     public function index(Request $request)
     {
         try {
-            $query = Product::with(['manufacturing', 'orderDetails.order'])
-                ->latest();
+            $query = Product::query()
+                ->with(['manufacturing', 'orderDetails']) 
+                ->latest(); 
 
-
-            if ($request->has('name')) {
-                $query->where('productName', 'like', '%'.$request->name.'%');
+            // Filtro por nombre
+            if ($request->has('search')) {
+                $query->where('product_name', 'like', '%'.$request->search.'%');
             }
 
+            // Filtro por stock mínimo
             if ($request->has('min_stock')) {
-                $query->where('currentStock', '>=', $request->min_stock);
+                $query->where('current_stock', '>=', $request->min_stock);
             }
 
-            if ($request->has('max_price')) {
-                $query->where('unityPrice', '<=', $request->max_price);
-            }
-
+            // Paginación o todos los resultados
             $products = $request->has('per_page') 
                 ? $query->paginate($request->per_page) 
                 : $query->get();
@@ -50,10 +79,11 @@ class ProductController extends Controller
         }
     }
 
+    // Mostrar un producto específico
     public function show($id)
     {
         try {
-            $product = Product::with(['manufacturing', 'orderDetail.order'])
+            $product = Product::with(['manufacturing', 'orderDetails'])
                 ->findOrFail($id);
 
             return response()->json([
@@ -70,20 +100,20 @@ class ProductController extends Controller
         }
     }
 
+    // Crear un nuevo producto
     public function store(Request $request)
     {
         DB::beginTransaction();
         try {
-            $validated = $request->validate(Product::validationRules());
+            // Validar datos de entrada
+            $validated = $request->validate($this->validationRules());
             
+            // Crear producto
             $product = Product::create($validated);
             
-            DB::commit();
+            DB::commit(); 
             
-            Log::info('Producto creado', [
-                'id' => $product->ID_product,
-                'name' => $product->productName
-            ]);
+            Log::info('Producto creado', ['id' => $product->id]);
 
             return response()->json([
                 'success' => true,
@@ -110,13 +140,17 @@ class ProductController extends Controller
         }
     }
 
+    // Actualizar un producto existente
     public function update(Request $request, $id)
     {
         DB::beginTransaction();
         try {
             $product = Product::findOrFail($id);
-            $validated = $request->validate(Product::validationRules($id));
+            
+            // Validar datos de entrada (incluyendo el ID para la regla unique)
+            $validated = $request->validate($this->validationRules($id));
 
+            // Actualizar producto
             $product->update($validated);
             
             DB::commit();
@@ -146,6 +180,7 @@ class ProductController extends Controller
         }
     }
 
+    // Eliminar un producto
     public function destroy($id)
     {
         DB::beginTransaction();
@@ -153,7 +188,7 @@ class ProductController extends Controller
             $product = Product::withCount(['orderDetails', 'manufacturing'])
                 ->findOrFail($id);
 
-
+            // Verificar si tiene registros asociados
             if ($product->order_details_count > 0 || $product->manufacturing_count > 0) {
                 return response()->json([
                     'success' => false,
@@ -161,6 +196,7 @@ class ProductController extends Controller
                 ], 409);
             }
 
+            // Eliminar producto
             $product->delete();
             
             DB::commit();
@@ -170,7 +206,7 @@ class ProductController extends Controller
             return response()->json([
                 'success' => true,
                 'message' => 'Producto eliminado correctamente'
-            ], 204);
+            ]);
 
         } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
             return response()->json([
@@ -189,6 +225,7 @@ class ProductController extends Controller
         }
     }
 
+    // Obtener información de stock específica
     public function stock($id)
     {
         try {
@@ -196,10 +233,11 @@ class ProductController extends Controller
                 ->findOrFail($id);
 
             $stockData = [
-                'current' => $product->currentStock,
-                'initial' => $product->initialQuantity,
-                'reserved' => $product->orderDetails->sum('requestedQuantity'),
-                'used_in_manufacturing' => $product->manufacturing->sum('quantity_used') // Verificar nombre correcto del campo
+                'current' => $product->current_stock,
+                'initial' => $product->initial_quantity,
+                'reserved' => $product->orderDetails->sum('quantity'),
+                'available' => $product->available_stock, // Usa el accesor del modelo
+                'used_in_manufacturing' => $product->manufacturing->sum('quantity_used')
             ];
 
             return response()->json([

@@ -4,57 +4,51 @@ namespace App\Models\Order;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use App\Models\Order\Order;
-use App\Models\Order\Product;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class OrderDetail extends Model
 {
-    protected $table = 'orderDetail';
-    protected $primaryKey = 'ID_orderDetail';
+    protected $table = 'order_details'; 
+    protected $primaryKey = 'id'; 
+
     protected $fillable = [
-        'ID_order',
-        'ID_product',
-        'requestedQuantity',
-        'priceQuantity', 
+        'order_id',          
+        'product_id',         
+        'requested_quantity', 
+        'unit_price',         
     ];
 
+    protected $casts = [
+        'unit_price' => 'decimal:2', 
+    ];
 
+    // Relación con Order (muchos detalles pertenecen a un pedido)
     public function order(): BelongsTo
     {
-        return $this->belongsTo(Order::class, 'ID_order', 'ID_order');
+        return $this->belongsTo(Order::class);
     }
 
-
-    public function product(): HasMany
+    // Relación con Product (muchos detalles pertenecen a un producto)
+    public function product(): BelongsTo
     {
-        return $this->HasMany(Product::class, 'ID_product', 'ID_product');
+        return $this->belongsTo(Product::class);
     }
 
-
+    // Accesor para calcular el precio total
     public function getTotalPriceAttribute()
     {
-        return $this->requestedQuantity * $this->priceQuantity;
+        return $this->requested_quantity * $this->unit_price;
     }  
 
-
-    public function setPriceQuantityAttribute($value)
+    // Mutador para asegurar formato correcto del precio
+    public function setUnitPriceAttribute($value)
     {
-        $this->attributes['priceQuantity'] = round($value, 2);
+        $this->attributes['unit_price'] = round($value, 2);
     }
 
-    public function getFormattedPriceQuantityAttribute()
+    // Accesor para precio formateado
+    public function getFormattedPriceAttribute()
     {
-        return number_format($this->priceQuantity, 2, ',', '.');
-    }
-
-    public static function validationRules($id = null): array
-    {
-        return [
-            'ID_order' => 'required|exists:order,ID_order',
-            'ID_product' => 'required|exists:product,ID_product',
-            'requestedQuantity' => 'required|integer|min:1',
-            'priceQuantity' => 'required|numeric|min:0.01',
-        ];
+        return number_format($this->unit_price, 2, ',', '.');
     }
 }

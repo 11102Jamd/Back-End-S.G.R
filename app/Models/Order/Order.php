@@ -1,5 +1,5 @@
 <?php
-//
+
 namespace App\Models\Order;
 
 use Illuminate\Database\Eloquent\Model;
@@ -12,83 +12,78 @@ use App\Models\Order\OrderDetail;
 
 class Order extends Model
 {
-
-    protected $table = 'order';
-    protected $primaryKey = 'ID_order';
+    protected $table = 'orders';
+    protected $primaryKey = 'id';
 
     protected $fillable = [
-        'ID_user',
-        'orderDate',
-        'orderTotal',
-
+        'user_id',
+        'order_date',
+        'order_total',
+        'status'
     ];
 
     protected $casts = [
-        'orderDate' => 'datetime',
-        'orderTotal' => 'decimal:2',
+        'order_date' => 'datetime',
+        'order_total' => 'decimal:2',
     ];
 
-    // Relación con detalles de pedido y productos 
-    
-    public function orderDetail(): HasMany
+    // Relación con detalles de pedido
+    public function orderDetails(): HasMany
     {
-        return $this->hasMany(OrderDetail::class, 'ID_order', 'ID_order');
+        return $this->hasMany(OrderDetail::class);
     }
 
     // Relación con usuario
     public function user(): BelongsTo
     {
-        return $this->belongsTo(User::class, 'ID_user', 'ID_user');
+        return $this->belongsTo(User::class);
     }
 
-
-    public static function validationRules($id = null): array
-    {
-        return [
-            'ID_user' => 'required|exists:users,ID_user',
-            'orderDate' => 'required|date|before_or_equal:today',
-            'orderTotal' => 'required|numeric|min:0.01|max:999999.99',
-
-        ];
-    }
-
-
+    
+    // Scope para pedidos recientes
     public function scopeRecent($query, $days = 30)
     {
-        return $query->where('orderDate', '>=', now()->subDays($days));
+        return $query->where('order_date', '>=', now()->subDays($days));
     }
 
-
+    // Accesor para fecha formateada
     public function getFormattedDateAttribute()
     {
-        return $this->orderDate ? $this->orderDate->format('d/m/Y H:i') : null;
+        return $this->order_date?->format('d/m/Y H:i');
     }
 
-
+    // Mutador para asegurar formato correcto del total
     public function setOrderTotalAttribute($value)
     {
-        $this->attributes['orderTotal'] = round($value, 2);
+        $this->attributes['order_total'] = round($value, 2);
     }
 
-
+    // Calcular total basado en detalles
     public function calculateTotal()
     {
-        return $this->orderDetail->sum(function($detail) {
-            return $detail->requestedQuantity * $detail->priceQuantity;
-        });
+        return $this->orderDetails->sum('total_price');
     }
 
+    // Actualizar el total del pedido
+    public function refreshTotal()
+    {
+        $this->update(['order_total' => $this->calculateTotal()]);
+        return $this;
+    }
 
+    // Eventos del modelo
     protected static function booted()
     {
+        // Establecer fecha automáticamente al crear
         static::creating(function ($order) {
-            if (empty($order->orderDate)) {
-                $order->orderDate = now();
+            if (empty($order->order_date)) {
+                $order->order_date = now();
             }
         });
 
+        // Eliminar detalles al eliminar pedido
         static::deleting(function ($order) {
-            $order->orderDetail()->delete();
+            $order->orderDetails()->delete();
         });
     }
 }

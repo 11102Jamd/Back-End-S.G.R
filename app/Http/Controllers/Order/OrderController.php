@@ -10,54 +10,62 @@ use Illuminate\Support\Facades\Log;
 
 class OrderController extends Controller
 {
-   
+    // Reglas de validación centralizadas
+    protected function validationRules($id = null): array
+    {
+        return [
+            'user_id' => 'required|exists:users,id',
+            'order_date' => 'sometimes|date|before_or_equal:now',
+            'order_total' => 'sometimes|numeric|min:0.01|max:999999.99',
+            'status' => 'sometimes|string|max:50'
+        ];
+    }
+
+    // Listar pedidos
     public function index(Request $request)
     {
         try {
-            $query = Order::with(['user', 'orderDetail.product'])
+            $query = Order::with(['user', 'orderDetails.product'])
                 ->latest();
 
             // Filtros dinámicos
-            if ($request->has('user_id')) {
-                $query->where('ID_user', $request->user_id);
-            }
+            $query->when($request->user_id, fn($q, $id) => $q->where('user_id', $id))
+                ->when($request->date_from, fn($q, $date) => $q->where('order_date', '>=', $date))
+                ->when($request->date_to, fn($q, $date) => $q->where('order_date', '<=', $date))
+                ->when($request->status, fn($q, $status) => $q->where('status', $status));
 
-            if ($request->has('date_from')) {
-                $query->where('orderDate', '>=', $request->date_from);
-            }
-
-            if ($request->has('date_to')) {
-                $query->where('orderDate', '<=', $request->date_to);
-            }
-
+            // Paginación o todos
             $orders = $request->has('per_page') 
                 ? $query->paginate($request->per_page) 
                 : $query->get();
 
             return response()->json([
                 'success' => true,
-                'data' => $orders
+                'data' => $orders,
+                'message' => 'Pedidos obtenidos exitosamente'
             ]);
 
         } catch (\Exception $e) {
-            Log::error('Error fetching orders: ' . $e->getMessage());
+            Log::error('Error al obtener pedidos: ' . $e->getMessage());
             return response()->json([
                 'success' => false,
-                'message' => 'Error al recuperar los pedidos'
+                'message' => 'Error al recuperar pedidos',
+                'error' => env('APP_DEBUG') ? $e->getMessage() : null
             ], 500);
         }
     }
 
-    
+    // Mostrar un pedido específico
     public function show($id)
     {
         try {
-            $order = Order::with(['user', 'orderDetail.product']) 
+            $order = Order::with(['user', 'orderDetails.product'])
                 ->findOrFail($id);
-            
+
             return response()->json([
                 'success' => true,
-                'data' => $order
+                'data' => $order,
+                'message' => 'Pedido encontrado'
             ]);
 
         } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
@@ -68,121 +76,114 @@ class OrderController extends Controller
         }
     }
 
+    // Crear nuevo pedido
     public function store(Request $request)
     {
-        $validated = $request->validate(Order::validationRules());
-
+        
         DB::beginTransaction();
         try {
+            $validated = $request->validate($this->validationRules());
+            
             $order = Order::create($validated);
             
             DB::commit();
             
-            Log::info("Pedido creado exitosamente", [
-                'order_id' => $order->ID_order, 
-                'user_id' => $validated['ID_user'] ?? null
+            Log::info('Pedido creado', [
+                'id' => $order->id,
+                'user_id' => $order->user_id,
+                'status' => $order->status
             ]);
-            
+
             return response()->json([
                 'success' => true,
-                'data' => $order,
+                'data' => $order->load('user', 'orderDetails.product'),
                 'message' => 'Pedido creado exitosamente'
             ], 201);
 
-        } catch (\Exception $e) {
+        } catch (\Illuminate\Validation\ValidationException $e) {
             DB::rollBack();
-            
-            Log::error("Error al crear pedido: " . $e->getMessage(), [
-                'error' => $e->getTraceAsString()
-            ]);
-            
             return response()->json([
                 'success' => false,
-                'message' => 'Error al crear el pedido',
+                'message' => 'Error de validación',
+                'errors' => $e->errors()
+            ], 422);
+        } catch (\Exception $e) {
+            DB::rollBack();
+            Log::error('Error al crear pedido: ' . $e->getMessage());
+            return response()->json([
+                'success' => false,
+                'message' => 'Error al crear pedido',
                 'error' => env('APP_DEBUG') ? $e->getMessage() : null
             ], 500);
         }
     }
 
+    // Actualizar pedido
     public function update(Request $request, $id)
     {
         DB::beginTransaction();
         try {
             $order = Order::findOrFail($id);
-            $validated = $request->validate(Order::validationRules($id));
+            $validated = $request->validate($this->validationRules($id));
 
             $order->update($validated);
             
             DB::commit();
             
-            Log::info("Pedido actualizado", ['order_id' => $id]);
-            
+            Log::info('Pedido actualizado', ['id' => $id, 'status' => $order->status]);
+
             return response()->json([
                 'success' => true,
-                'data' => $order,
+                'data' => $order->fresh(['user', 'orderDetails.product']),
                 'message' => 'Pedido actualizado correctamente'
             ]);
 
-        } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Pedido no encontrado'
-            ], 404);
-            
         } catch (\Exception $e) {
             DB::rollBack();
-            
-            Log::error("Error al actualizar pedido: " . $e->getMessage());
-            
+            Log::error('Error al actualizar pedido: ' . $e->getMessage());
             return response()->json([
                 'success' => false,
-                'message' => 'Error al actualizar el pedido',
+                'message' => 'Error al actualizar pedido',
                 'error' => env('APP_DEBUG') ? $e->getMessage() : null
             ], 500);
         }
     }
 
+    // Eliminar pedido
     public function destroy($id)
     {
         DB::beginTransaction();
         try {
             $order = Order::findOrFail($id);
+
             $order->delete();
             
             DB::commit();
             
-            Log::info("Pedido eliminado", ['order_id' => $id]);
-            
+            Log::info('Pedido eliminado', ['id' => $id]);
+
             return response()->json([
                 'success' => true,
                 'message' => 'Pedido eliminado correctamente'
-            ], 204);
+            ]);
 
-        } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Pedido no encontrado'
-            ], 404);
-            
         } catch (\Exception $e) {
             DB::rollBack();
-            
-            Log::error("Error al eliminar pedido: " . $e->getMessage());
-            
+            Log::error('Error al eliminar pedido: ' . $e->getMessage());
             return response()->json([
                 'success' => false,
-                'message' => 'Error al eliminar el pedido',
+                'message' => 'Error al eliminar pedido',
                 'error' => env('APP_DEBUG') ? $e->getMessage() : null
             ], 500);
         }
     }
 
-
+    // Pedidos recientes
     public function recent($days = 30)
     {
         try {
             $orders = Order::recent($days)
-                ->with(['user', 'orderDetail.product'])
+                ->with(['user', 'orderDetails.product'])
                 ->get();
                 
             return response()->json([
@@ -192,11 +193,11 @@ class OrderController extends Controller
             ]);
 
         } catch (\Exception $e) {
-            Log::error("Error al obtener pedidos recientes: " . $e->getMessage());
-            
+            Log::error('Error al obtener pedidos recientes: ' . $e->getMessage());
             return response()->json([
                 'success' => false,
-                'message' => 'Error al obtener pedidos recientes'
+                'message' => 'Error al obtener pedidos recientes',
+                'error' => env('APP_DEBUG') ? $e->getMessage() : null
             ], 500);
         }
     }
