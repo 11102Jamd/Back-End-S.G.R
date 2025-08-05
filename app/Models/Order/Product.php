@@ -13,20 +13,20 @@ use App\Models\Order\OrderDetail;
 
 class Product extends Model
 {
-    protected $table = 'products'; 
+    protected $table = 'product'; 
     protected $primaryKey = 'id'; 
 
     // Campos que se pueden asignar masivamente
     protected $fillable = [
-        'product_name',      
-        'initial_quantity',  
-        'current_stock',     
-        'unit_price',        
+        'ProductName',      
+        'InitialQuantity',  
+        'CurrentStock',     
+        'UnityPrice',        
     ];
 
     // Conversiones de tipos de atributos
     protected $casts = [
-        'unit_price' => 'decimal:2', // Asegura 2 decimales para el precio
+        'UnityPrice' => 'decimal:2', // Asegura 2 decimales para el precio
     ];
 
     // Relación con Manufacturing (Fabricación)
@@ -49,14 +49,14 @@ class Product extends Model
         // Validación al guardar (create/update)
         static::saving(function ($model) {
             // Validación de stock vs cantidad inicial
-            if ($model->current_stock > $model->initial_quantity) {
+            if ($model->CurrentStock > $model->InitialQuantity) {
                 throw ValidationException::withMessages([
-                    'current_stock' => 'El stock actual no puede superar la cantidad inicial'
+                    'CurrentStock' => 'El stock actual no puede superar la cantidad inicial'
                 ]);
             }
 
             // Validación de precio mínimo si tiene pedidos
-            if ($model->orderDetails()->exists() && $model->unit_price < 50) {
+            if ($model->orderDetails()->exists() && $model->UnitPrice < 50) {
                 throw new \Exception("Productos con pedidos no pueden tener precio menor a 50");
             }
         });
@@ -65,12 +65,12 @@ class Product extends Model
     // Accesor para precio formateado
     public function getFormattedPriceAttribute()
     {
-        return '$ ' . number_format($this->unit_price, 2);
+        return '$ ' . number_format($this->unit_price, 3, ',', '.');
     }
 
     // Accesor para stock disponible calculado
     public function getAvailableStockAttribute()
     {
-        return $this->current_stock - $this->orderDetails->sum('quantity');
+        return $this->CurrentStock - $this->orderDetails->sum('quantity');
     }
 }

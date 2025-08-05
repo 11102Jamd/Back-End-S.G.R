@@ -4,51 +4,54 @@ namespace App\Models\Order;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Illuminate\Database\Eloquent\Relations\HasMany;
+
+
 
 class OrderDetail extends Model
 {
-    protected $table = 'order_details'; 
-    protected $primaryKey = 'id'; 
+    protected $table = 'orderDetail'; 
+    protected $primaryKey = 'id';
 
     protected $fillable = [
-        'order_id',          
-        'product_id',         
-        'requested_quantity', 
-        'unit_price',         
+        'ID_order',
+        'ID_product',
+        'requestedQuantity',
+        'princeQuantity'
     ];
 
     protected $casts = [
-        'unit_price' => 'decimal:2', 
+        'requestedQuantity' => 'decimal:2',
+        'princeQuantity' => 'decimal:3',
     ];
 
-    // Relación con Order (muchos detalles pertenecen a un pedido)
+    // Relación con el pedido
     public function order(): BelongsTo
     {
-        return $this->belongsTo(Order::class);
+        return $this->belongsTo(Order::class, 'ID_order');
     }
 
-    // Relación con Product (muchos detalles pertenecen a un producto)
+    // Relación con el producto
     public function product(): BelongsTo
     {
-        return $this->belongsTo(Product::class);
+        return $this->belongsTo(Product::class, 'ID_product');
     }
 
-    // Accesor para calcular el precio total
+    // Accesor para el precio total del detalle
     public function getTotalPriceAttribute()
     {
-        return $this->requested_quantity * $this->unit_price;
-    }  
-
-    // Mutador para asegurar formato correcto del precio
-    public function setUnitPriceAttribute($value)
-    {
-        $this->attributes['unit_price'] = round($value, 2);
+        return $this->requestedQuantity * $this->princeQuantity;
     }
 
-    // Accesor para precio formateado
-    public function getFormattedPriceAttribute()
+    // Eventos del modelo
+    protected static function booted()
     {
-        return number_format($this->unit_price, 2, ',', '.');
+        // Actualizar el total del pedido cuando cambia un detalle
+        static::saved(function ($detail) {
+            $detail->order->refreshTotal();
+        });
+
+        static::deleted(function ($detail) {
+            $detail->order->refreshTotal();
+        });
     }
 }

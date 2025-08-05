@@ -7,75 +7,67 @@ use App\Models\Order\Product;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Validation\Rule;
+use Symfony\Component\HttpFoundation\Response;
 
 class ProductController extends Controller
 {
-    // Reglas de validación para creación/actualización
-    protected function validationRules($id = null): array
+    // Método para reglas de validación reutilizable
+    protected function getValidationRules($id = null): array
     {
         return [
-            'product_name' => [
+            'ProductName' => [
                 'required',
                 'string',
                 'max:50',
-                'unique:products,product_name,'.$id.',id' 
+                Rule::unique('product', 'ProductName')->ignore($id)
             ],
-            'initial_quantity' => [
-                'required',
-                'integer',
-                'min:0' 
-            ],
-            'current_stock' => [
-                'sometimes', 
-                'integer',
-                'min:0',
-                'lte:initial_quantity' 
-            ],
-            'unit_price' => [
-                'required',
-                'numeric',
-                'min:0.01', 
-                'max:999999.99' 
-            ]
+            'InitialQuantity' => 'required|integer|min:0',
+            'CurrentStock' => 'sometimes|integer|min:0|lte:InitialQuantity',
+            'UnityPrice' => 'required|numeric|min:0.01|max:999999.99'
         ];
     }
 
-    // Listar todos los productos (con filtros opcionales)
+    // Respuestas API estandarizadas
+    protected function apiSuccess($data = null, string $message = '', int $code = Response::HTTP_OK)
+    {
+        return response()->json([
+            'success' => true,
+            'data' => $data,
+            'message' => $message
+        ], $code);
+    }
+
+    protected function apiError(string $message, $error = null, int $code = Response::HTTP_INTERNAL_SERVER_ERROR)
+    {
+        return response()->json([
+            'success' => false,
+            'message' => $message,
+            'error' => app()->isLocal() ? $error : null
+        ], $code);
+    }
+
+    // CRUD Methods
     public function index(Request $request)
     {
         try {
-            $query = Product::query()
-                ->with(['manufacturing', 'orderDetails']) 
-                ->latest(); 
+            $query = Product::with(['manufacturing', 'orderDetails'])
+                ->latest();
 
-            // Filtro por nombre
-            if ($request->has('search')) {
-                $query->where('product_name', 'like', '%'.$request->search.'%');
-            }
+            // Filtros
+            $query->when($request->search, fn($q, $search) => 
+                $q->where('ProductName', 'like', "%{$search}%"));
+                
+            $query->when($request->min_stock, fn($q, $stock) => 
+                $q->where('CurrentStock', '>=', $stock));
 
-            // Filtro por stock mínimo
-            if ($request->has('min_stock')) {
-                $query->where('current_stock', '>=', $request->min_stock);
-            }
+            $products = $request->per_page ? $query->paginate($request->per_page) : $query->get();
 
-            // Paginación o todos los resultados
-            $products = $request->has('per_page') 
-                ? $query->paginate($request->per_page) 
-                : $query->get();
-
-            return response()->json([
-                'success' => true,
-                'data' => $products,
-                'message' => 'Productos obtenidos exitosamente'
-            ]);
+            return $this->apiSuccess($products, 'Productos obtenidos exitosamente');
 
         } catch (\Exception $e) {
-            Log::error('Error al obtener productos: '.$e->getMessage());
-            return response()->json([
-                'success' => false,
-                'message' => 'Error al recuperar los productos',
-                'error' => env('APP_DEBUG') ? $e->getMessage() : null
-            ], 500);
+            Log::error("ProductController@index - Error: {$e->getMessage()}");
+            return $this->apiError('Error al obtener productos', $e->getMessage());
         }
     }
 
@@ -83,20 +75,14 @@ class ProductController extends Controller
     public function show($id)
     {
         try {
-            $product = Product::with(['manufacturing', 'orderDetails'])
-                ->findOrFail($id);
-
-            return response()->json([
-                'success' => true,
-                'data' => $product,
-                'message' => 'Producto encontrado'
-            ]);
+            $product = Product::with(['manufacturing', 'orderDetails'])->findOrFail($id);
+            return $this->apiSuccess($product, 'Producto encontrado');
 
         } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Producto no encontrado'
-            ], 404);
+            return $this->apiError('Producto no encontrado', null, Response::HTTP_NOT_FOUND);
+        } catch (\Exception $e) {
+            Log::error("ProductController@show - Error: {$e->getMessage()}");
+            return $this->apiError('Error al buscar producto', $e->getMessage());
         }
     }
 
@@ -105,160 +91,104 @@ class ProductController extends Controller
     {
         DB::beginTransaction();
         try {
-            // Validar datos de entrada
-            $validated = $request->validate($this->validationRules());
+            $validated = $request->validate($this->getValidationRules());
             
-            // Crear producto
+            // Verificar si el producto ya existe
             $product = Product::create($validated);
             
-            DB::commit(); 
-            
-            Log::info('Producto creado', ['id' => $product->id]);
+            DB::commit();
+            Log::info("Producto creado - ID: {$product->id}");
 
-            return response()->json([
-                'success' => true,
-                'data' => $product,
-                'message' => 'Producto creado exitosamente'
-            ], 201);
+            return $this->apiSuccess($product, 'Producto creado exitosamente', Response::HTTP_CREATED);
 
         } catch (\Illuminate\Validation\ValidationException $e) {
             DB::rollBack();
-            return response()->json([
-                'success' => false,
-                'message' => 'Error de validación',
-                'errors' => $e->errors()
-            ], 422);
-            
+            return $this->apiError('Error de validación', $e->errors(), Response::HTTP_UNPROCESSABLE_ENTITY);
         } catch (\Exception $e) {
             DB::rollBack();
-            Log::error('Error al crear producto: '.$e->getMessage());
-            return response()->json([
-                'success' => false,
-                'message' => 'Error al crear el producto',
-                'error' => env('APP_DEBUG') ? $e->getMessage() : null
-            ], 500);
+            Log::error("ProductController@store - Error: {$e->getMessage()}");
+            return $this->apiError('Error al crear producto', $e->getMessage());
         }
     }
 
-    // Actualizar un producto existente
+
     public function update(Request $request, $id)
     {
         DB::beginTransaction();
         try {
             $product = Product::findOrFail($id);
-            
-            // Validar datos de entrada (incluyendo el ID para la regla unique)
-            $validated = $request->validate($this->validationRules($id));
+            $validated = $request->validate($this->getValidationRules($id));
 
-            // Actualizar producto
             $product->update($validated);
             
             DB::commit();
-            
-            Log::info('Producto actualizado', ['id' => $id]);
+            Log::info("Producto actualizado - ID: {$id}");
 
-            return response()->json([
-                'success' => true,
-                'data' => $product,
-                'message' => 'Producto actualizado correctamente'
-            ]);
+            return $this->apiSuccess($product, 'Producto actualizado correctamente');
 
         } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Producto no encontrado'
-            ], 404);
-            
+            return $this->apiError('Producto no encontrado', null, Response::HTTP_NOT_FOUND);
         } catch (\Exception $e) {
             DB::rollBack();
-            Log::error('Error al actualizar producto: '.$e->getMessage());
-            return response()->json([
-                'success' => false,
-                'message' => 'Error al actualizar el producto',
-                'error' => env('APP_DEBUG') ? $e->getMessage() : null
-            ], 500);
+            Log::error("ProductController@update - Error: {$e->getMessage()}");
+            return $this->apiError('Error al actualizar producto', $e->getMessage());
         }
     }
 
-    // Eliminar un producto
+
     public function destroy($id)
     {
         DB::beginTransaction();
         try {
-            $product = Product::withCount(['orderDetails', 'manufacturing'])
-                ->findOrFail($id);
+            $product = Product::withCount(['orderDetails', 'manufacturing'])->findOrFail($id);
 
-            // Verificar si tiene registros asociados
+
+            // Verificar si tiene detalles de pedido o fabricación
             if ($product->order_details_count > 0 || $product->manufacturing_count > 0) {
-                return response()->json([
-                    'success' => false,
-                    'message' => 'No se puede eliminar, el producto tiene registros asociados'
-                ], 409);
+                return $this->apiError(
+                    'No se puede eliminar, el producto tiene registros asociados',
+                    null,
+                    Response::HTTP_CONFLICT
+                );
             }
 
-            // Eliminar producto
             $product->delete();
             
             DB::commit();
-            
-            Log::info('Producto eliminado', ['id' => $id]);
+            Log::info("Producto eliminado - ID: {$id}");
 
-            return response()->json([
-                'success' => true,
-                'message' => 'Producto eliminado correctamente'
-            ]);
+            return $this->apiSuccess(null, 'Producto eliminado correctamente');
 
         } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Producto no encontrado'
-            ], 404);
-            
+            return $this->apiError('Producto no encontrado', null, Response::HTTP_NOT_FOUND);
         } catch (\Exception $e) {
             DB::rollBack();
-            Log::error('Error al eliminar producto: '.$e->getMessage());
-            return response()->json([
-                'success' => false,
-                'message' => 'Error al eliminar el producto',
-                'error' => env('APP_DEBUG') ? $e->getMessage() : null
-            ], 500);
+            Log::error("ProductController@destroy - Error: {$e->getMessage()}");
+            return $this->apiError('Error al eliminar producto', $e->getMessage());
         }
     }
 
-    // Obtener información de stock específica
+    // Método para obtener el estado del stock
     public function stock($id)
     {
         try {
-            $product = Product::with(['manufacturing', 'orderDetails'])
-                ->findOrFail($id);
+            $product = Product::with(['manufacturing', 'orderDetails'])->findOrFail($id);
 
             $stockData = [
-                'current' => $product->current_stock,
-                'initial' => $product->initial_quantity,
+                'current' => $product->CurrentStock,
+                'initial' => $product->InitialQuantity,
                 'reserved' => $product->orderDetails->sum('quantity'),
-                'available' => $product->available_stock, // Usa el accesor del modelo
+                'available' => $product->available_stock,
                 'used_in_manufacturing' => $product->manufacturing->sum('quantity_used')
             ];
 
-            return response()->json([
-                'success' => true,
-                'data' => $stockData,
-                'message' => 'Estado de stock obtenido'
-            ]);
+            return $this->apiSuccess($stockData, 'Estado de stock obtenido');
 
         } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Producto no encontrado'
-            ], 404);
-            
+            return $this->apiError('Producto no encontrado', null, Response::HTTP_NOT_FOUND);
         } catch (\Exception $e) {
-            Log::error('Error al obtener stock: '.$e->getMessage());
-            return response()->json([
-                'success' => false,
-                'message' => 'Error al obtener el stock',
-                'error' => env('APP_DEBUG') ? $e->getMessage() : null
-            ], 500);
+            Log::error("ProductController@stock - Error: {$e->getMessage()}");
+            return $this->apiError('Error al obtener stock', $e->getMessage());
         }
     }
 }

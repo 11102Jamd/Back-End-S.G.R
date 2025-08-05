@@ -27,16 +27,16 @@ class Order extends Model
         'order_total' => 'decimal:2',
     ];
 
-    // Relación con detalles de pedido
-    public function orderDetails(): HasMany
+    // Relación con detalles de pedido (ajustado a nombre de tabla 'orderDetail')
+    public function details(): HasMany
     {
-        return $this->hasMany(OrderDetail::class);
+        return $this->hasMany(OrderDetail::class, 'ID_order');
     }
 
     // Relación con usuario
     public function user(): BelongsTo
     {
-        return $this->belongsTo(User::class);
+        return $this->belongsTo(User::class, 'user_id');
     }
 
     
@@ -61,7 +61,9 @@ class Order extends Model
     // Calcular total basado en detalles
     public function calculateTotal()
     {
-        return $this->orderDetails->sum('total_price');
+        return $this->details->sum(function($detail) {
+            return $detail->requestedQuantity * $detail->princeQuantity;
+        });
     }
 
     // Actualizar el total del pedido
@@ -83,7 +85,7 @@ class Order extends Model
 
         // Eliminar detalles al eliminar pedido
         static::deleting(function ($order) {
-            $order->orderDetails()->delete();
+            $order->details()->delete();
         });
     }
 }

@@ -18,6 +18,7 @@ return new class extends Migration
             $table->integer('CurrentStock');
             $table->double('UnityPrice',10,3);
             $table->timestamps();
+            
         });
     }
 
