@@ -14,7 +14,7 @@ return new class extends Migration
         Schema::create('manufacturing', function (Blueprint $table) {
             $table->id();
             $table->foreignId('ID_product')->constrained('product')->cascadeOnDelete()->cascadeOnUpdate();
-            $table->time('ManufacturingTime');
+            $table->integer('ManufacturingTime');
             $table->integer('Labour');
             $table->double('ManufactureProductG',10,3);
             $table->double('TotalCostProduction',10,3);

@@ -17,4 +17,10 @@ class SupplierController extends BaseCrudController
         'Addres'=>'required|string|max:255',
         'Phone'=>'required|string|max:10'
     ];
+
+    public function update(Request $request, $id)
+    {
+        $this->validationRules['email'] = 'required|email|unique:users,email,'.$id;
+        return parent::update($request, $id);
+    }
 }

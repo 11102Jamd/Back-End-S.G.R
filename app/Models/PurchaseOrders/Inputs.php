@@ -29,7 +29,7 @@ class Inputs extends Model
 
     public function inputOrders(): HasMany
     {
-        return $this->hasMany(InputOrder::class,'ID_input');
+        return $this->hasMany(inputOrder::class,'ID_input');
     }
 
     public function recipes()      
