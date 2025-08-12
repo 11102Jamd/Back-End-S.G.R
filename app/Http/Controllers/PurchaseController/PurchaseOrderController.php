@@ -27,11 +27,12 @@ class PurchaseOrderController extends BaseCrudController
     //sobre escribir el metodo store del crud, porque una orden de compra puede tener muchos insumos.
     public function store(Request $request)
     {
+        //dd($request->all());
         DB::beginTransaction();
         try {
             // Validación de entrada
             $validationData = $this->validateRequest($request);
-            
+
             $purchaseOrder = $this->model::create([
                 'ID_supplier' => $validationData['ID_supplier'],
                 'PurchaseOrderDate' => $validationData['PurchaseOrderDate'],
@@ -54,5 +55,10 @@ class PurchaseOrderController extends BaseCrudController
                 'message' => $th->getMessage(),
             ], 422);
         }
+    }
+
+    public function index(){
+        $orders = PurchaseOrder::with(['supplier:id,name','inputOrders.input'])->get();
+        return response()->json($orders);
     }
 }

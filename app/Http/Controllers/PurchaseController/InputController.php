@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Controllers\globalCrud\BaseCrudController;
 use App\Models\PurchaseOrders\Inputs;
 use Illuminate\Http\Request;
+use Illuminate\Support\Arr;
 
 class InputController extends BaseCrudController
 {
@@ -28,5 +29,4 @@ class InputController extends BaseCrudController
         //Devuelve por parametro los inputs en formato json
         return response()->json($inputs);
     }
-
 }
