@@ -75,7 +75,7 @@ class Recipe extends Model
         if (!$inputOrder) {
             throw new \Exception("El insumo no esta abastecido");
         }
-        
+
         $amountManufacturing = $this->getGramsAttribute($this->AmountSpent, $inputOrder->UnitMeasurement);
 
         $UnityPrice = $inputOrder->UnityPrice;
@@ -90,4 +90,5 @@ class Recipe extends Model
             $input->increment('CurrentStock', $this->AmountSpent);
         }
     }
+    
 }

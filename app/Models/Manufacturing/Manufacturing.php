@@ -85,4 +85,5 @@ class Manufacturing extends Model
 
         return $this->fresh()->load('recipes.input');
     }
+    
 }

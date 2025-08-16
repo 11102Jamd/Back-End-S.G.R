@@ -38,5 +38,6 @@ class InputOrder extends Model
     public function purchaseOrder():BelongsTo
     {
         return $this->belongsTo(PurchaseOrder::class,'ID_purchase_order');
-    }    
+    }
+    
 }

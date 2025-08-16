@@ -43,7 +43,7 @@ class PurchaseOrder extends Model
             $input = Inputs::findOrFail($inputData['ID_input']);
 
             $grams = $input->convertUnit(
-                
+
                 $inputData['UnitMeasurement'],
                 $inputData['InitialQuantity']
             );
@@ -54,11 +54,11 @@ class PurchaseOrder extends Model
 
             $inputOrder = $this->inputOrders()->create([
                 'ID_input' => $input->id,
-                'PriceQuantity' => $subtotal,                
+                'PriceQuantity' => $subtotal,
                 'UnitMeasurement' => $inputData['UnitMeasurement'],
                 'InitialQuantity' => $inputData['InitialQuantity'],
                 'UnityPrice' => $inputData['UnityPrice']
-            ]);            
+            ]);
             $total += $subtotal;
             $createdInputOrders[] = $inputOrder;
         }
@@ -72,3 +72,4 @@ class PurchaseOrder extends Model
         ];
     }
 }
+
