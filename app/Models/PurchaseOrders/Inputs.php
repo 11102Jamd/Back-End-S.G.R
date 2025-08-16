@@ -5,7 +5,7 @@ namespace App\Models\PurchaseOrders;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Support\Facades\DB;
-use App\Models\Fabricacion\Recipes;
+use App\Models\Manufacturing\Recipe;
 use App\Models\PurchaseOrders\InputOrder;
 
 
@@ -29,12 +29,12 @@ class Inputs extends Model
 
     public function inputOrders(): HasMany
     {
-        return $this->hasMany(InputOrder::class,'ID_input');
+        return $this->hasMany(inputOrder::class,'ID_input');
     }
 
-    public function recipes()
+    public function recipes()      
     {
-        return $this->hasMany(Recipes::class);
+        return $this->hasMany(Recipe::class,'ID_manufacturing');
     }
 
 
