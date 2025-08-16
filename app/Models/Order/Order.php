@@ -8,84 +8,52 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use App\Models\User;
 use App\Models\Order\OrderDetail;
 
-
-
+/*creo la clase Order que extiende de Model y
+defino los campos que se pueden llenar masivamente*/
 class Order extends Model
 {
-    protected $table = 'orders';
-    protected $primaryKey = 'id';
+    protected $table = 'order';
 
     protected $fillable = [
-        'user_id',
-        'order_date',
-        'order_total',
-        'status'
+        'ID_order',
+        'ID_user',
+        'orderDate',
+        'orderTotal'
     ];
 
-    protected $casts = [
-        'order_date' => 'datetime',
-        'order_total' => 'decimal:2',
-    ];
-
-    // Relación con detalles de pedido (ajustado a nombre de tabla 'orderDetail')
+    // Hagalo el relacionamiento con detalles del pedido de muchos a uno
     public function details(): HasMany
     {
         return $this->hasMany(OrderDetail::class, 'ID_order');
     }
 
-    // Relación con usuario
+    // Hagalo el relacionamiento con detalles del pedido de uno a muchos
     public function user(): BelongsTo
     {
-        return $this->belongsTo(User::class, 'user_id');
+        return $this->belongsTo(User::class, 'ID_user');
     }
 
-    
-    // Scope para pedidos recientes
-    public function scopeRecent($query, $days = 30)
-    {
-        return $query->where('order_date', '>=', now()->subDays($days));
-    }
-
-    // Accesor para fecha formateada
+    // Accesor para formatear la fecha
     public function getFormattedDateAttribute()
     {
-        return $this->order_date?->format('d/m/Y H:i');
+        return $this->orderDate?->format('d/m/Y H:i');
     }
 
-    // Mutador para asegurar formato correcto del total
-    public function setOrderTotalAttribute($value)
-    {
-        $this->attributes['order_total'] = round($value, 2);
-    }
-
-    // Calcular total basado en detalles
+    // Este método calcula el total del pedido sumando los totales de los detalles
     public function calculateTotal()
     {
         return $this->details->sum(function($detail) {
-            return $detail->requestedQuantity * $detail->princeQuantity;
+            return $detail->requestedQuantity * $detail->priceQuantity;
         });
     }
+    
 
     // Actualizar el total del pedido
     public function refreshTotal()
     {
-        $this->update(['order_total' => $this->calculateTotal()]);
+        $this->update(['orderTotal' => $this->calculateTotal()]);
         return $this;
     }
 
-    // Eventos del modelo
-    protected static function booted()
-    {
-        // Establecer fecha automáticamente al crear
-        static::creating(function ($order) {
-            if (empty($order->order_date)) {
-                $order->order_date = now();
-            }
-        });
 
-        // Eliminar detalles al eliminar pedido
-        static::deleting(function ($order) {
-            $order->details()->delete();
-        });
-    }
 }

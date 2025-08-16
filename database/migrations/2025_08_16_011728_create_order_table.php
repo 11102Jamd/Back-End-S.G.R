@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('order', function (Blueprint $table) {
             $table->id('ID_order');
-            $table->foreignId('ID_user')->constrained('users')->cascadeOnDelete()->cascadeOnUpdate();;
+            $table->foreignId('ID_user')->constrained('users')->cascadeOnDelete()->cascadeOnUpdate();
             $table->dateTime('orderDate');
             $table->decimal('orderTotal', 10, 3);
             $table->timestamps();
@@ -28,3 +28,4 @@ return new class extends Migration
         Schema::dropIfExists('order');
     }
 };
+
