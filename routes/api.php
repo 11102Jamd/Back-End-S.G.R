@@ -7,9 +7,11 @@ use App\Http\Controllers\Order\ProductController;
 use App\Http\Controllers\PurchaseController\InputController;
 use App\Http\Controllers\PurchaseController\PurchaseOrderController;
 use App\Http\Controllers\PurchaseController\SupplierController;
+use App\Http\Controllers\UserController\UserController;
 use Illuminate\Support\Facades\Route;
 
 Route::post('/login', [AuthController::class, 'login']);
+Route::post('/reset-password', [AuthController::class, 'resetPassword']);
 
 Route::middleware('auth:sanctum')->group(function () {
     Route::post('/logout', [AuthController::class, 'logout']);
@@ -26,6 +28,7 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::apiResource('purchase', PurchaseOrderController::class)->except(['destroy']);
         Route::apiResource('products', ProductController::class);
         Route::apiResource('manufacturing', ManufacturingController::class)->except(['destroy']);
+        Route::apiResource('users', UserController::class);
     });
 
     /**
