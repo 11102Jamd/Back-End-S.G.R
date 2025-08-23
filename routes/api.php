@@ -1,20 +1,37 @@
 <?php
 
-use App\Http\Controllers\Auth\AuthController;
-use App\Http\Controllers\Order\ProductController;
-use App\Http\Controllers\PurchaseController\InputController;
-use Illuminate\Support\Facades\Request;
-use App\Http\Controllers\Fabricacion\ManufacturingController;
-use App\Http\Controllers\PurchaseController\PurchaseOrderController;
-use App\Http\Controllers\PurchaseController\SupplierController;
-use App\Models\PurchaseOrders\Inputs;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\Order\OrderDetailController;
+use App\Http\Controllers\Order\ProductController;
+use App\Http\Controllers\Order\OrderController;
 
-Route::post('/login', [AuthController::class, 'login']);
 Route::middleware('auth:sanctum')->group(function () {
-    Route::post('/logout', [AuthController::class, 'logout']);
-    Route::get('/user', function (Request $request) {
-        return $request->user();
+    //pedidos
+    Route::prefix('orders')->group(function () {
+        Route::get('/', [OrderController::class, 'index']);
+        Route::post('/', [OrderController::class, 'store']);
+        Route::get('/recent/{days?}', [OrderController::class, 'recent']);
+        Route::get('/{id}', [OrderController::class, 'show']);
+        Route::put('/{id}', [OrderController::class, 'update']);
+        Route::delete('/{id}', [OrderController::class, 'destroy']);
+
+        // Detalles de pedido
+        Route::prefix('{orderId}/details')->group(function () {
+            Route::get('/', [OrderDetailController::class, 'index']);
+            Route::post('/', [OrderDetailController::class, 'store']);
+            Route::get('/{id}', [OrderDetailController::class, 'show']);
+            Route::put('/{id}', [OrderDetailController::class, 'update']);
+            Route::delete('/{id}', [OrderDetailController::class, 'destroy']);
+        });
+    });
+        // Productos
+    Route::prefix('products')->group(function () {
+        Route::get('/', [ProductController::class, 'index']);
+        Route::post('/', [ProductController::class, 'store']);
+        Route::get('/{id}', [ProductController::class, 'show']);
+        Route::get('/{id}/stock', [ProductController::class, 'stock']);
+        Route::put('/{id}', [ProductController::class, 'update']);
+        Route::delete('/{id}', [ProductController::class, 'destroy']);
     });
 
     Route::middleware(['is_baker'])->group(function () {
