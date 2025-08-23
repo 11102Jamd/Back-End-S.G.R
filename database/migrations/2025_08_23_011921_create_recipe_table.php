@@ -13,11 +13,9 @@ return new class extends Migration
     {
         Schema::create('recipe', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('ID_manufacturing')->constrained('manufacturing')->cascadeOnDelete()->cascadeOnUpdate();
-            $table->foreignId('ID_inputs')->constrained('inputs')->cascadeOnDelete()->cascadeOnUpdate();
-            $table->double('AmountSpent',10,3);
-            $table->string('UnitMeasurement',10);
-            $table->double('PriceQuantitySpent',10,3);
+            $table->string('recipe_name', 60);
+            $table->decimal('yield_quantity');
+            $table->string('unit', 15);
             $table->timestamps();
         });
     }

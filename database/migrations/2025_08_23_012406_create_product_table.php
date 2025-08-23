@@ -13,10 +13,8 @@ return new class extends Migration
     {
         Schema::create('product', function (Blueprint $table) {
             $table->id();
-            $table->string('ProductName',50);
-            $table->integer('InitialQuantity');
-            $table->integer('CurrentStock');
-            $table->double('UnityPrice',10,3);
+            $table->string('product_name', 50);
+            $table->decimal('unit_price', 10,3);
             $table->timestamps();
         });
     }
