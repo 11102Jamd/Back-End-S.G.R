@@ -17,6 +17,10 @@ class EnsureIsCashier
     {
         $user = $request->user();
 
+        if ($user && $user->isAdmin()) {
+            return $next($request);
+        }
+
         if (!$user || !$user->isCashier()) {
             abort($user ? 403 : 401, $user ? 'Acceso solo para cajeros' : 'No autenticado');
         }

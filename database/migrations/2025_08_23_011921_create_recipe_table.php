@@ -11,13 +11,11 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('manufacturing', function (Blueprint $table) {
+        Schema::create('recipe', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('ID_product')->constrained('product')->cascadeOnDelete()->cascadeOnUpdate();
-            $table->time('ManufacturingTime');
-            $table->integer('Labour');
-            $table->double('ManufactureProductG',10,3);
-            $table->double('TotalCostProduction',10,3);
+            $table->string('recipe_name', 60);
+            $table->decimal('yield_quantity');
+            $table->string('unit', 15);
             $table->timestamps();
         });
     }
@@ -27,6 +25,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('manufacturing');
+        Schema::dropIfExists('recipe');
     }
 };

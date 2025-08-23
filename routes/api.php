@@ -1,49 +1,38 @@
 <?php
 
+use App\Http\Controllers\Auth\AuthController;
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\Order\OrderDetailController;
-use App\Http\Controllers\Order\ProductController;
-use App\Http\Controllers\Order\OrderController;
+
+Route::post('/login', [AuthController::class, 'login']);
+Route::post('/reset-password', [AuthController::class, 'resetPassword']);
 
 Route::middleware('auth:sanctum')->group(function () {
-    //pedidos
-    Route::prefix('orders')->group(function () {
-        Route::get('/', [OrderController::class, 'index']);
-        Route::post('/', [OrderController::class, 'store']);
-        Route::get('/recent/{days?}', [OrderController::class, 'recent']);
-        Route::get('/{id}', [OrderController::class, 'show']);
-        Route::put('/{id}', [OrderController::class, 'update']);
-        Route::delete('/{id}', [OrderController::class, 'destroy']);
 
-        // Detalles de pedido
-        Route::prefix('{orderId}/details')->group(function () {
-            Route::get('/', [OrderDetailController::class, 'index']);
-            Route::post('/', [OrderDetailController::class, 'store']);
-            Route::get('/{id}', [OrderDetailController::class, 'show']);
-            Route::put('/{id}', [OrderDetailController::class, 'update']);
-            Route::delete('/{id}', [OrderDetailController::class, 'destroy']);
-        });
-    });
-        // Productos
-    Route::prefix('products')->group(function () {
-        Route::get('/', [ProductController::class, 'index']);
-        Route::post('/', [ProductController::class, 'store']);
-        Route::get('/{id}', [ProductController::class, 'show']);
-        Route::get('/{id}/stock', [ProductController::class, 'stock']);
-        Route::put('/{id}', [ProductController::class, 'update']);
-        Route::delete('/{id}', [ProductController::class, 'destroy']);
-    });
-
-    Route::middleware(['is_baker'])->group(function () {
-        Route::apiResource('inputs', InputController::class);
-    });
+    /**
+     * Rutas especificas para el rol Administrador
+     */
     Route::middleware(['is_admin'])->group(function () {
-        Route::apiResource('inputs', InputController::class);
+        // Route::apiResource('suppliers', SupplierController::class);
+        // Route::apiResource('inputs', InputController::class);
+        // Route::apiResource('purchase', PurchaseOrderController::class)->except(['destroy']);
+        // Route::apiResource('products', ProductController::class);
+        // Route::apiResource('manufacturing', ManufacturingController::class)->except(['destroy']);
+        // Route::apiResource('users', UserController::class);
     });
 
-});
+    /**
+     * Rutas especificas para el panadero
+     */
+    Route::middleware(['is_baker'])->group(function () {
+        // Route::apiResource('manufacturing', ManufacturingController::class);
+        // Route::apiResource('inputs', InputController::class)->only(['index', 'show', 'store', 'update']);
+    });
 
-Route::apiResource('manufacturing', ManufacturingController::class);
-Route::apiResource('inputs', InputController::class);
-Route::apiResource('purchaseorder', PurchaseOrderController::class);
-Route::apiResource('supplier', SupplierController::class);
+    /**
+     * Rutas especificas para el Cajero
+     */
+    Route::middleware(['is_cashier'])->group(function () {
+        // Route::apiResource('products', ProductController::class)->only(['index', 'show']);
+        // Route::apiResource('purchase', PurchaseOrderController::class)->only(['index', 'store']);
+    });
+});
