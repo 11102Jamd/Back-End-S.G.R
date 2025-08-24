@@ -1,6 +1,8 @@
 <?php
 
 use App\Http\Controllers\Auth\AuthController;
+use App\Http\Controllers\InputController;
+use App\Http\Controllers\OrderController;
 use Illuminate\Support\Facades\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -41,3 +43,6 @@ Route::middleware('auth:sanctum')->group(function () {
         // Route::apiResource('purchase', PurchaseOrderController::class)->only(['index', 'store']);
     });
 });
+
+Route::apiResource('input', InputController::class);
+Route::apiResource('order', OrderController::class);

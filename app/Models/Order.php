@@ -21,5 +21,4 @@ class Order extends Model
     {
         return $this->hasMany(InputBatch::class, 'order_id', 'id');
     }
-
 }

@@ -26,7 +26,7 @@ class InputBatch extends Model
     {
         return $this->belongsTo(Input::class, 'input_id');
     }
-    
+
     public function order(): BelongsTo
     {
         return $this->belongsTo(Order::class, 'order_id');
@@ -44,4 +44,5 @@ class InputBatch extends Model
     {
         return $this->$query()->where('input_id', $inputId)->where('quantity_remaining', '>', 0)->orderBy('received_date');
     }
+    
 }
