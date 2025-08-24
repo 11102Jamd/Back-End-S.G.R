@@ -10,8 +10,8 @@ use App\Models\ProductionConsumption;
 class Input extends Model
 {
     protected $table = 'input';
-    protected $fillable =
-    [
+    
+    protected $fillable = [
         'name',
         'unit'
     ];

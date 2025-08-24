@@ -11,9 +11,10 @@ use Illuminate\Http\Request;
 
 class OrderController extends BaseCrudController
 {
-    //
     protected $model = Order::class;
+
     protected $orderService;
+
     protected $validationRules  = [
         'supplier_name' => 'required|string|max:50',
         'order_date' => 'required|date',

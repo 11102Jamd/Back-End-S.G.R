@@ -10,7 +10,8 @@ use App\Models\ProductionConsumption;
 class InputBatch extends Model
 {
     protected $table = 'input_batches';
-    protected $fillable =  [
+
+    protected $fillable = [
         'order_id',
         'input_id',
         'quantity_total',
@@ -32,7 +33,7 @@ class InputBatch extends Model
         return $this->belongsTo(Order::class, 'order_id');
     }
 
-    // Public function order(): BelongsTo 
+    // Public function order(): BelongsTo
 
     public function productionConsumptions(): HasMany
     {
@@ -44,5 +45,5 @@ class InputBatch extends Model
     {
         return $this->$query()->where('input_id', $inputId)->where('quantity_remaining', '>', 0)->orderBy('received_date');
     }
-    
+
 }

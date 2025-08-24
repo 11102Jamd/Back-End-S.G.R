@@ -12,6 +12,9 @@ use function Symfony\Component\Clock\now;
 
 class  OrderService
 {
+    /**
+     * agrega comentario
+     */
     protected function getNextBatchNumber(int $inputId)
     {
         $lastBatch  =  InputBatch::where('input_id', $inputId)->orderBy('batch_number')->first();
@@ -29,6 +32,9 @@ class  OrderService
         };
     }
 
+    /**
+     * Agrega el comentario
+     */
     public function createOrderWithBatches(array $orderData): Order
     {
         return DB::transaction(function () use ($orderData) {
@@ -44,10 +50,14 @@ class  OrderService
             foreach ($orderData['items'] as $item) {
                 $this->createInputBatch($order->id, $item);
             }
+
             return $order->load('batches');
         });
     }
 
+    /**
+     * Agrega el comentario
+     */
     protected function createInputBatch(int $orderId, array $itemData): InputBatch
     {
         $input = Input::findOrFail($itemData['input_id']);
