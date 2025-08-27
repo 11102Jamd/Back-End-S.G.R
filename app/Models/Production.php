@@ -8,6 +8,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Symfony\Component\Console\Input\Input;
 
+
 class Production extends Model
 {
     use HasFactory;
@@ -45,8 +46,4 @@ class Production extends Model
         );
     }
 
-    // public function productProductions(): HasMany
-    // {
-    //     return $this->hasMany(ProductProduction::class, 'production_id');
-    // }
 }

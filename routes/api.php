@@ -4,11 +4,13 @@ use App\Http\Controllers\Auth\AuthController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\InputController;
 use App\Http\Controllers\OrderController;
+use App\Http\Controllers\ProductionController;
+use App\Http\Controllers\RecipeController;
 use Illuminate\Support\Facades\Request;
 use Illuminate\Support\Facades\Route;
 
-Route::post('/login', [AuthController::class, 'login']);
-Route::post('/reset-password', [AuthController::class, 'resetPassword']);
+// Route::post('/login', [AuthController::class, 'login']);
+// Route::post('/reset-password', [AuthController::class, 'resetPassword']);
 
 Route::middleware('auth:sanctum')->group(function () {
     Route::post('/logout', [AuthController::class, 'logout']);
@@ -47,3 +49,7 @@ Route::middleware('auth:sanctum')->group(function () {
 
 Route::apiResource('input', InputController::class);
 Route::apiResource('order', OrderController::class);
+Route::apiResource('recipe',RecipeController::class);
+Route::apiResource('production',ProductionController::class);
+Route::post('/production', [ProductionController::class, 'executeProduction']);
+Route::post('/recipe',[RecipeController::class,'store']);
