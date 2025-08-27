@@ -2,15 +2,11 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Symfony\Component\Console\Input\Input;
 
 class ProductionConsumption extends Model
 {
-    use HasFactory;
-
     protected $table = 'production_consumptions';
 
     protected $fillable = [
@@ -22,7 +18,6 @@ class ProductionConsumption extends Model
         'total_cost',
     ];
 
-    // Relaciones
     public function production(): BelongsTo
     {
         return $this->belongsTo(Production::class, 'production_id');
@@ -37,5 +32,4 @@ class ProductionConsumption extends Model
     {
         return $this->belongsTo(InputBatch::class, 'input_batches_id');
     }
-
 }

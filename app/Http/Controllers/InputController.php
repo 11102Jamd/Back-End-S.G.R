@@ -32,7 +32,7 @@ class InputController extends BaseCrudController
     {
         try {
             $this->validationRules['name'] = 'required|string|unique:input,name,' . $id;
-            parent::update($request, $id);
+            return parent::update($request, $id);
         } catch (\Throwable $th) {
             return response()->json([
                 'error' => 'No se pudo actualizar el insumo',

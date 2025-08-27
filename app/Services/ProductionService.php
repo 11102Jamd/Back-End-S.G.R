@@ -10,7 +10,7 @@ use Illuminate\Support\Facades\DB;
 
 class ProductionService
 {
-    protected function calculateBatchCost(float $gramsUsed, InputBatch $batch)
+    protected function calculateBatchCost(float $gramsUsed, InputBatch $batch): float
     {
         $unit = strtolower($batch->input->unit);
         $conversionRates = ['kg' => 1000, 'lb' => 453.592, 'g' => 1, 'l' => 1000, 'un' => 1];
@@ -20,7 +20,7 @@ class ProductionService
         return $unitsUsed * $batch->unit_price;
     }
 
-    protected function consumeIngredient(int $productionId, int $inputId, float $requiredGrams)
+    protected function consumeIngredient(int $productionId, int $inputId, float $requiredGrams): array
     {
         $remaining = $requiredGrams;
         $totalCost = 0;
@@ -79,7 +79,7 @@ class ProductionService
             ]);
             $totalCost = 0;
             foreach ($recipe->recipeIngredients as $ingredient) {
-                $requiredGrams = $ingredient->quantity_requiered * $scaleFactor;
+                $requiredGrams = $ingredient->quantity_required * $scaleFactor;
                 $consumptionResult = $this->consumeIngredient(
                     $production->id,
                     $ingredient->input_id,
@@ -93,7 +93,7 @@ class ProductionService
                 'price_for_product' => round($totalCost / $quantityToProduce, 3)
             ]);
 
-            return $production->load('consumptions.batch.input');
+            return $production->load('productionConsumptions.batch.input');
         });
     }
 }

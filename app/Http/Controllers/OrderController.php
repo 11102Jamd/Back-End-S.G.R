@@ -45,7 +45,7 @@ class OrderController extends BaseCrudController
     public function store(Request $request)
     {
         try {
-            $validated = $this->validateRequest($request);
+            $validated = $this->validationRequest($request);
             foreach ($validated['items'] as $item) {
                 $input = Input::find($item['input_id']);
 

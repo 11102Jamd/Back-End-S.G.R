@@ -2,17 +2,14 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use App\Models\Recipe;
+use App\Models\ProductionConsumption;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
-use Symfony\Component\Console\Input\Input;
-
 
 class Production extends Model
 {
-    use HasFactory;
-
     protected $table = 'production';
 
     protected $fillable = [
@@ -33,17 +30,4 @@ class Production extends Model
     {
         return $this->hasMany(ProductionConsumption::class, 'production_id');
     }
-
-    public function inputs()
-    {
-        return $this->hasManyThrough(
-            Input::class,
-            ProductionConsumption::class,
-            'production_id',
-            'id',
-            'id',
-            'input_id'
-        );
-    }
-
 }
