@@ -19,6 +19,9 @@ Route::middleware('auth:sanctum')->group(function () {
      * Rutas especificas para el rol Administrador
      */
     Route::middleware(['is_admin'])->group(function () {
+        Route::apiResource('input', InputController::class);
+        Route::apiResource('order', OrderController::class);
+
         // Route::apiResource('suppliers', SupplierController::class);
         // Route::apiResource('inputs', InputController::class);
         // Route::apiResource('purchase', PurchaseOrderController::class)->except(['destroy']);
