@@ -44,8 +44,8 @@ class RecipeController extends BaseCrudController
 
     public function store(Request $request)
     {
-        $validated = $this->validationRequest($request);
         try {
+            $validated = $this->validationRequest($request);
             $recipe = $this->recipeService->createRecipe($validated);
             return response()->json($recipe);
         } catch (\Throwable $th) {
