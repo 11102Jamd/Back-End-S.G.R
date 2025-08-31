@@ -52,7 +52,7 @@ class OrderController extends BaseCrudController
     {
         try {
             $validated = $this->validateRequest($request);
-            
+
             //Ciclo para recorrer los itmes de la compra para validar existencia y unidades de medida
             foreach ($validated['items'] as $item) {
                 $input = Input::find($item['input_id']);
@@ -79,6 +79,19 @@ class OrderController extends BaseCrudController
                 'message' => 'error al crear la orden',
                 'error' => $th->getMessage()
             ], 422);
+        }
+    }
+
+    public function show($id)
+    {
+        try {
+            $order = Order::with('batches.input')->findOrFail($id);
+            return response()->json($order);
+        } catch (\Throwable $th) {
+            return response()->json([
+                'message' => 'erro al optener la orden',
+                'error' => $th->getMessage()
+            ]);
         }
     }
 }
