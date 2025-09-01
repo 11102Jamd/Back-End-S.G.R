@@ -56,8 +56,10 @@ class ProductionService
         }
 
         if ($remaining > 0) {
-            throw new \Exception("Stock insuficiente para el insumo:$inputId falta {$remaining}");
+            $inputName = $batches->first()?->input?->input_name ?? "ID {$inputId}";
+            throw new \Exception("Stock insuficiente para el insumo: {$inputName}. Faltan {$remaining} gramos.");
         }
+
         return [
             'total_grams_used' => $requiredGrams - $remaining,
             'total_cost' => round($totalCost, 3),
@@ -94,6 +96,22 @@ class ProductionService
             ]);
 
             return $production->load('productionConsumptions.batch.input');
+        });
+    }
+    public function destroyProduction(int $id)
+    {
+        return DB::transaction(function () use ($id) {
+            $production = Production::with('productionConsumptions.batch')->findOrFail($id);
+
+            foreach ($production->productionConsumptions as $consumption) {
+                $batch = $consumption->batch;
+                if ($batch) {
+                    $batch->increment('quantity_remaining', $consumption->quantity_used);
+                }
+                $consumption->delete();
+            }
+            $production->delete();
+            return true;
         });
     }
 }

@@ -56,4 +56,16 @@ class ProductionController extends Controller
             ], 422);
         }
     }
+    public function destroy($id)
+    {
+        try {
+            $this->productionService->destroyProduction($id);
+            return response()->json(['message' => 'Producción eliminada y consumos revertidos correctamente']);
+        } catch (\Throwable $th) {
+            return response()->json([
+                'error' => 'No se pudo eliminar la producción',
+                'message' => $th->getMessage(),
+            ], 500);
+        }
+    }
 }

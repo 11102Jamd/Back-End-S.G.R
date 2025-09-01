@@ -12,6 +12,7 @@ class RecipeService
     {
         return DB::transaction(function () use ($data) {
             $recipe = Recipe::create([
+                //Crear la receta
                 'recipe_name' => $data['recipe_name'],
                 'yield_quantity' => $data['yield_quantity'],
                 'unit' => $data['unit']
@@ -19,11 +20,34 @@ class RecipeService
             foreach ($data['ingredient'] as $ingredient) {
                 RecipeIngredient::create([
                     'recipe_id' => $recipe->id,
-                    'input_id'=>$ingredient['input_id'],
-                    'quantity_required'=>$ingredient['quantity_required'],
+                    'input_id' => $ingredient['input_id'],
+                    'quantity_required' => $ingredient['quantity_required'],
                 ]);
             }
             return $recipe;
+        });
+    }
+    public function updateRecipe(int $id, array $data)
+    {
+        return DB::transaction(function () use ($id, $data) {
+            $recipe = Recipe::findOrFail($id);
+
+            $recipe->update([
+                'recipe_name'    => $data['recipe_name'],
+                'yield_quantity' => $data['yield_quantity'],
+                'unit'           => $data['unit']
+            ]);
+            $recipe->recipeIngredients()->delete();
+
+            foreach ($data['ingredient'] as $ingredient) {
+                RecipeIngredient::create([
+                    'recipe_id'         => $recipe->id,
+                    'input_id'          => $ingredient['input_id'],
+                    'quantity_required' => $ingredient['quantity_required'],
+                ]);
+            }
+
+            return $recipe->load('recipeIngredients');
         });
     }
 }

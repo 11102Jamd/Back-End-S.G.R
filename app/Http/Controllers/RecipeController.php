@@ -15,7 +15,7 @@ class RecipeController extends BaseCrudController
 
     protected $validationRules = [
         'recipe_name' => 'required|string|max:50',
-        'yield_quantity' => 'required|integer|max:10',
+        'yield_quantity' => 'required|integer|max:100',
         'unit' => 'required|string|max:10',
         'ingredient' => 'required|array|min:1',
         'ingredient.*.input_id' => 'required|exists:input,id',
@@ -52,6 +52,19 @@ class RecipeController extends BaseCrudController
             //throw $th;
             return response()->json([
                 'error' => 'Datos invalidados',
+                'message' => $th->getMessage(),
+            ], 422);
+        }
+    }
+    public function update(Request $request, $id)
+    {
+        try {
+            $validated = $this->validationRequest($request);
+            $recipe = $this->recipeService->updateRecipe($id, $validated);
+            return response()->json($recipe);
+        } catch (\Throwable $th) {
+            return response()->json([
+                'error' => 'No se pudo actualizar la receta',
                 'message' => $th->getMessage(),
             ], 422);
         }

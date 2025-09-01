@@ -5,11 +5,13 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 use App\Models\Recipe;
 use App\Models\ProductionConsumption;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Production extends Model
 {
+    use HasFactory;
     protected $table = 'production';
 
     protected $fillable = [

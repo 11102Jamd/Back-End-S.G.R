@@ -6,9 +6,12 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use App\Models\InputBatch;
 use App\Models\ProductionConsumption;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 class Input extends Model
 {
+    use HasFactory;
+
     protected $table = 'input';
     
     protected $fillable = [
