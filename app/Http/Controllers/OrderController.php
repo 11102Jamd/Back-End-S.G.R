@@ -89,7 +89,7 @@ class OrderController extends BaseCrudController
             return response()->json($order);
         } catch (\Throwable $th) {
             return response()->json([
-                'message' => 'erro al optener la orden',
+                'message' => 'error al optener la orden',
                 'error' => $th->getMessage()
             ]);
         }
