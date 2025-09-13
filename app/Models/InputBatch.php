@@ -10,9 +10,14 @@ use App\Models\ProductionConsumption;
 
 class InputBatch extends Model
 {
+    // Importa el trait HasFactory para habilitar la creación de fábricas de datos.
     use HasFactory;
+
+    // Define el nombre de la tabla asociada a este modelo. Si no se especifica, Laravel utilizaría el nombre pluralizado del modelo por defecto.
     protected $table = 'input_batches';
 
+    // Definición de los atributos que se pueden asignar masivamente.
+    // Esto ayuda a la protección contra la vulnerabilidad de la asignación masiva.
     protected $fillable = [
         'order_id',
         'input_id',
@@ -24,19 +29,20 @@ class InputBatch extends Model
         'received_date'
     ];
 
-    //Public function input(): BelongsTo
+    //Método público llamado input que retorna un tipo de relación esto
+    // indica que este modelo está asociado a otro modelo llamado Input.
     public function input(): BelongsTo
     {
         return $this->belongsTo(Input::class, 'input_id');
     }
 
+    //Define una relacion de tipo pertenece a el modelo actual, donde la clave foranea es 'order_id'
     public function order(): BelongsTo
     {
         return $this->belongsTo(Order::class, 'order_id');
     }
 
-    // Public function order(): BelongsTo
-
+    //Metodo que define la relacion de consumo o gasto de insumos a una produccion
     public function productionConsumptions(): HasMany
     {
         return $this->hasMany(ProductionConsumption::class, 'input_batches_id', 'id');
@@ -47,5 +53,4 @@ class InputBatch extends Model
     {
         return $this->$query()->where('input_id', $inputId)->where('quantity_remaining', '>', 0)->orderBy('received_date');
     }
-
 }

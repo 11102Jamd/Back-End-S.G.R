@@ -17,9 +17,14 @@ class InputBatchFactory extends Factory
      * @return array<string, mixed>
      */
 
+
+    //Especifica que esta fabrica esta vinculada al modelo InputBatch
     protected $model = InputBatch::class;
+
+    //Define el estado predeterminado del modelo
     public function definition(): array
     {
+        //Crea un nuevo pedido asociado a este lote utilizando la fàbrica de Order
         return [
             'order_id' => Order::factory(), 
             'input_id' => 1,

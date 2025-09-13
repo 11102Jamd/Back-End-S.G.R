@@ -82,12 +82,17 @@ class OrderController extends BaseCrudController
         }
     }
 
+    //Declara un método público que recibe un parámetro $id    
     public function show($id)
     {
         try {
+            // Intenta buscar una orden por su ID utilizando Eloquent
+            // Se cargan de forma anticipada las relaciones 'batches' e 'input' asociadas a la orden de compra
             $order = Order::with('batches.input')->findOrFail($id);
+            // Devuelve la orden encontrada como respuesta en formato JSON
             return response()->json($order);
         } catch (\Throwable $th) {
+            // Captura cualquier excepción que ocurra durante la búsqueda de la orden de compra
             return response()->json([
                 'message' => 'error al optener la orden',
                 'error' => $th->getMessage()
