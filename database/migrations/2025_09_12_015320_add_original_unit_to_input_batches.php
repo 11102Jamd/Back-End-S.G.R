@@ -11,11 +11,9 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('input', function (Blueprint $table) {
-            $table->id();
-            $table->string('name', 30);
-            $table->string('category', 30);
-            $table->timestamps();
+        Schema::table('input_batches', function (Blueprint $table) {
+            //
+            $table->string('original_unit')->nullable()->comment('Unidad ingresada por el usuario');
         });
     }
 
@@ -24,6 +22,9 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('input');
+        Schema::table('input_batches', function (Blueprint $table) {
+            //
+            $table->dropColumn('original_unit');
+        });
     }
 };

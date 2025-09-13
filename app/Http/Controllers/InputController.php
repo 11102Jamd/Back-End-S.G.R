@@ -8,13 +8,16 @@ use App\Models\Input;
 
 class InputController extends BaseCrudController
 {
-    //
+    //Para trabajar con la tabla de la base de datos
     protected $model = Input::class;
+
+    //Las reglas de validacion para los insumos
     protected $validationRules = [
         'name' => 'required|string|max:50|unique:input,name',
-        'unit' => 'required|string|max:10'
+        'category' => 'required|string|max:20'
     ];
 
+    //Metodo para listar los insumos, permite mostrar los registro de la bd
     public function index()
     {
         try {
@@ -28,6 +31,7 @@ class InputController extends BaseCrudController
         }
     }
 
+    //Metodo que permite actualizar un insumo existente en la bd
     public function update(Request $request, $id)
     {
         try {

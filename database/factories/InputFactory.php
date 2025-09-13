@@ -10,13 +10,18 @@ use App\Models\Input;
  */
 class InputFactory extends Factory
 {
+    //Especifica que esta que esta fabrica esta vinculada al modelo Input
     protected $model = Input::class;
 
+    //Define el estado predeterminado del modelo
     public function definition(): array
     {
         return [
-            'name' => $this->faker->word(),
-            'unit' => $this->faker->randomElement(['kg', 'g', 'L', 'ml']),
+            //Genera un nombre aleatorio para el insumo
+            'name' => $this->faker->word(), //Nombre del insumo como palabra aleatoria
+
+            //Selecciona aleatoriamente una unidad de medida entre las opciones especificadas
+            'unit' => $this->faker->randomElement(['kg', 'lb', 'l', 'un']) //Unidades de medida
         ];
     }
 }
