@@ -82,7 +82,7 @@ class OrderController extends BaseCrudController
         }
     }
 
-    //Declara un método público que recibe un parámetro $id    
+    //Declara un método público que recibe un parámetro $id
     public function show($id)
     {
         try {

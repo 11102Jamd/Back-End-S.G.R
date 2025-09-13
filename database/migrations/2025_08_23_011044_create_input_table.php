@@ -14,7 +14,7 @@ return new class extends Migration
         Schema::create('input', function (Blueprint $table) {
             $table->id();
             $table->string('name', 30);
-            $table->string('unit', 30);
+            $table->string('category', 30);
             $table->timestamps();
         });
     }

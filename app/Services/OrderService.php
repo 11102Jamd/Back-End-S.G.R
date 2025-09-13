@@ -43,7 +43,7 @@ class  OrderService
         return $quantity * ($conversions[$unit] ?? 1);
     }
 
-    //Metodo que crea ordenes de compra, calcula el total y guarda y registra los lotes 
+    //Metodo que crea ordenes de compra, calcula el total y guarda y registra los lotes
 
     public function createOrderWithBatches(array $orderData): Order
     {
@@ -85,10 +85,13 @@ class  OrderService
 
 
     /*Metodo protegido que  se encarga de registrar un nuevo lote de insumo dentro de orden de compra,
-    al que se le pasan dos parametros importantes, 
+    al que se le pasan dos parametros importantes,
     el id de la compra a la que pertenece el lote, un array con los datos del insumo
     */
 
+    /**
+     * Me
+     */
     protected function createInputBatch(int $orderId, array $itemData, Collection $inputs, Collection $lastBatchNumbers): InputBatch
     {
         // Obtener el Input desde la colección cargada (sin query a la BD)
@@ -99,7 +102,7 @@ class  OrderService
 
         // Calcular el número de lote usando los datos precargados
         $batchNumber = isset($lastBatchNumbers[$itemData['input_id']]) ? $lastBatchNumbers[$itemData['input_id']] + 1 : 1;
-        
+
         // Crear el lote en la BD
         return InputBatch::create([
             'order_id' => $orderId,

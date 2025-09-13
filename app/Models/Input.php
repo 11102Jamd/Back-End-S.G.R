@@ -11,11 +11,11 @@ class Input extends Model
 {
     //Nombre de la tabla asociada a la bd
     protected $table = 'input';
-    
+
     //Campos para asignar en los insumos
     protected $fillable = [
         'name',
-        'unit'
+        'category'
     ];
 
     //Metodo para limitar la eliminacion, una receta no queda huerfana
@@ -48,6 +48,9 @@ class Input extends Model
     }
 
     //Metetodo que filtra los lotes que tienen stock y estan activos, del mas antiguo y disponible.
+    /**
+     * Mettodo que filtyara
+     */
     public function  oldestActiveBatch()
     {
         return $this->batches()->where('quantity_remaining', '>', 0)->orderBy('create_at', 'asc')->first();
