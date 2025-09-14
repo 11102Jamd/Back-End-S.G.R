@@ -4,6 +4,7 @@ use App\Http\Controllers\Auth\AuthController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\InputController;
 use App\Http\Controllers\OrderController;
+use App\Http\Controllers\OrderPdfController;
 use App\Http\Controllers\ProductionController;
 use App\Http\Controllers\RecipeController;
 
@@ -63,3 +64,4 @@ Route::apiResource('input', InputController::class);
 Route::apiResource('order', OrderController::class);
 Route::apiResource('recipe',RecipeController::class);
 Route::apiResource('production',ProductionController::class);
+Route::post('/order/export-pdf', [OrderPdfController::class, 'exportPdf']);

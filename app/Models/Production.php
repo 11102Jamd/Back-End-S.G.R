@@ -9,7 +9,13 @@ use App\Models\ProductProduction;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
-
+/**
+ * Modelo Production
+ *
+ * Representa un registro de producción en el sistema.
+ * Contiene información sobre la receta utilizada, la cantidad a producir,
+ * costos y relaciones con consumos de insumos.
+ */
 class Production extends Model
 {
     use HasFactory;
@@ -24,12 +30,21 @@ class Production extends Model
         'production_date',
     ];
 
-    // Relaciones
+    /**
+     * Relación: Obtiene la receta asociada a la producción.
+     *
+     * @return BelongsTo
+     */
     public function recipe(): BelongsTo
     {
         return $this->belongsTo(Recipe::class, 'recipe_id');
     }
 
+    /**
+     * Relación: Obtiene los consumos de insumos asociados a la producción.
+     *
+     * @return HasMany
+     */
     public function productionConsumptions(): HasMany
     {
         return $this->hasMany(ProductionConsumption::class, 'production_id');

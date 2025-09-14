@@ -16,6 +16,7 @@ return new class extends Migration
             $table->foreignId('recipe_id')->constrained('recipe')->onDelete('cascade')->onUpdate('cascade');
             $table->foreignId('input_id')->constrained('input')->onDelete('cascade')->onUpdate('cascade');
             $table->decimal('quantity_required', 10,3);
+            $table->string('unit_used',10);//g/ml/un de la categorya del input
             $table->timestamps();
         });
     }

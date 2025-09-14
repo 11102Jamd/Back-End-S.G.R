@@ -21,6 +21,9 @@ class Input extends Model
         'category'
     ];
 
+    //Metodo para limitar la eliminacion, una receta no queda huerfana
+
+
     //Relacion de insumos con los lotes,un insumo puede tener muchos lotes
     public function batches(): HasMany
     {
