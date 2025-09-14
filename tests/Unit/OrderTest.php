@@ -60,7 +60,7 @@ class OrderTest extends TestCase
             ]);
     }
 
-    //Test que valida la creación de una nueva orden y el retorno de lotes y total 
+    //Test que valida la creación de una nueva orden y el retorno de lotes y total
     public function can_create_order_and_returns_batches_and_total(): void
     {
         // Arrange: crear insumos válidos (unidades permitidas)

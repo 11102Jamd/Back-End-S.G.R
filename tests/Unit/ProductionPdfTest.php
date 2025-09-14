@@ -5,14 +5,13 @@
  * Juan Alejandro Muñoz Devia
  */
 
-namespace Tests\Feature;
+namespace Tests\Unit;
 
 use App\Models\Input;
 use App\Models\InputBatch;
 use App\Models\Order;
 use App\Models\Production;
 use App\Models\ProductionConsumption;
-use App\Models\Product;
 use App\Models\Recipe;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Tests\TestCase;
@@ -147,6 +146,7 @@ class ProductionPdfTest extends TestCase
      * Se valida:
      * - Código de respuesta 422
      */
+
     #[Test]
     public function export_pdf_with_mayor_start_date()
     {

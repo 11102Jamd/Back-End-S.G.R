@@ -5,7 +5,7 @@
  * Juan Alejandro Muñoz Devia
  */
 
-namespace Tests\Feature;
+namespace Tests\Unit;
 
 /**
  * Importamos los distintos tyraist que vamos a manejar
@@ -142,7 +142,7 @@ class OrderPdfTest extends TestCase
         $response->assertStatus(422);
     }
 
-    
+
     /**
      *
      *

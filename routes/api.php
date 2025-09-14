@@ -8,6 +8,7 @@ use App\Http\Controllers\OrderPdfController;
 use App\Http\Controllers\ProductionController;
 use App\Http\Controllers\ProductionPdfController;
 use App\Http\Controllers\RecipeController;
+use App\Http\Controllers\SalePdfController;
 
 Route::post('/login', [AuthController::class, 'login']);
 Route::post('/reset-password', [AuthController::class, 'resetPassword']);
@@ -67,3 +68,4 @@ Route::apiResource('recipe',RecipeController::class);
 Route::apiResource('production',ProductionController::class);
 Route::post('/order/export-pdf', [OrderPdfController::class, 'exportPdf']);
 Route::post('/production/export-pdf', [ProductionPdfController::class, 'exportPdf']);
+Route::post('/sale/export-pdf', [SalePdfController::class, 'exportPdf']);

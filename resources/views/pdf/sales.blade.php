@@ -50,12 +50,11 @@
             text-align: right;
         }
     </style>
-    <title>Reporte de Producciones</title>
+    <title>Reporte de Ventas</title>
 </head>
 <body>
-    {{-- Encabezado del Pdf --}}
     <div class="header">
-        <div class="title">Reporte de Producciones</div>
+        <div class="title">Reporte de Ventas</div>
         <div class="period">
             Período: {{ $startDate ?? 'N/A' }} al {{ $endDate ?? 'N/A' }}
         </div>
@@ -64,45 +63,34 @@
         </div>
     </div>
 
-    {{-- Iterar sobre todas las ordenes --}}
-    @foreach ($productions as $production)
-        @php
-            $firstProductProduction = $production->productProductions->first();
-        @endphp
-
+    @foreach ($sales as $sale)
         <table>
             <tr class="order-header">
                 <td colspan="4">
-                    Producción N° {{ $production->id }} -
-                    Receta: {{ $production->recipe->recipe_name ?? 'Sin Receta' }} -
-                    Producto: {{ $firstProductProduction->product->product_name ?? 'Sin producto' }} -
-                    Fecha: {{ Carbon\Carbon::parse($production->production_date)->format('d/m/Y') }}
-                    Ganancia: {{$firstProductProduction->profit_margin_porcentage ?? 'Sin Ganancia'}} %
+                    Venta N° {{ $sale->id }}
+                    Usuario: {{ $sale->user->name ?? 'Sin Usuario' }} -
+                    Fecha: {{ Carbon\Carbon::parse($sale->sale_date)->format('d/m/Y') }}
                 </td>
             </tr>
             <tr>
-                <th>Insumo</th>
-                <th>Cantidad Gastada</th>
+                <th>Producto</th>
+                <th>Cantidad Solicitada</th>
+                <th>Precio Unitario</th>
                 <th>Subtotal</th>
-                <th>Lote N°</th>
             </tr>
-            {{-- Detalle de produccion --}}
-            @foreach ($production->productionConsumptions as $consumption)
+
+            @foreach ($sale->saleProducts as $salesProduct)
                 <tr>
-                    <td>{{ $consumption->batch->input->name ?? 'N/A' }}</td>
-                    <td>{{ number_format($consumption->quantity_used,0) }} {{$consumption->batch->unit_converted}}</td>
-                    <td class="text-right">${{ number_format($consumption->total_cost, 0) }}</td>
-                    <td>{{ $consumption->batch->batch_number ?? 'N/A' }}</td>
+                    <td>{{ $salesProduct->product->product_name ?? 'N/A' }}</td>
+                    <td>{{ $salesProduct->quantity_requested }} unidades</td>
+                    <td class="text-right">${{ number_format($salesProduct->product->unit_price ?? 0, 0) }}</td>
+                    <td class="text-right">${{ number_format($salesProduct->subtotal_price, 0) }}</td>
                 </tr>
             @endforeach
 
             <tr class="order-total">
-                <td colspan="3">Precio por producto</td>
-                <td class="text-right">${{ number_format($production->price_for_product ?? 0, 0) }}</td>
-            </tr>
-            <tr class="order-total">
-                <td colspan="3">Total Producción:</td>
-                <td class="text-right">${{ number_format($production->total_cost, 0) }}</td>
+                <td colspan="3">Total Venta:</td>
+                <td class="text-right">${{ number_format($sale->sale_total, 0) }}</td>
             </tr>
         </table>
 
@@ -111,9 +99,8 @@
         @endif
     @endforeach
 
-    {{-- Total de producciones realizadas --}}
     <div class="grand-total">
-        Total de las Producciones: ${{ number_format($totalProductions, 0) }}
+        Total de las Ventas: ${{ number_format($totalSales, 0) }}
     </div>
 </body>
 </html>
