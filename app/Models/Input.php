@@ -12,23 +12,25 @@ class Input extends Model
 {
     use HasFactory;
 
+    //Nombre de la tabla asociada a la bd
     protected $table = 'input';
-    
+
+    //Campos para asignar en los insumos
     protected $fillable = [
         'name',
-        'unit'
+        'category'
     ];
 
-    //Protected static function booted()
-    //Metodo para limitar la eliminacio, una receta no queda huerfana
+    //Metodo para limitar la eliminacion, una receta no queda huerfana
     protected static function booted()
     {
+        //Valida el insert para que no se generen resgistros inecesarios a la bd, es como un filtro para hacer los inserts
         static::saving(function ($input) {
             if (!in_array(strtolower($input->unit), ['kg', 'g', 'lb', 'l', 'un'])) {
                 throw new \Exception("Unidad no valida para guardar cambios");
             }
         });
-
+        //Antes de confirmar el eliminado lanza la excepcion y bloquea el delete si no cumple con los parametros
         static::deleting(function ($input) {
             if ($input->producs()->count() > 0) {
                 throw new \Exception("No puedes eliminar un insumo asociado a una receta");
@@ -36,18 +38,22 @@ class Input extends Model
         });
     }
 
+    //Relacion de insumos con los lotes,un insumo puede tener muchos lotes
     public function batches(): HasMany
     {
         return $this->hasMany(InputBatch::class, 'input_id', 'id');
     }
 
-    //Relacion  con produyccion
+    //Relacion que tiene con produccion, porque un insumo se puede usar en muchas recetas
     public function productionConsumptions(): HasMany
     {
         return $this->hasMany(ProductionConsumption::class, 'input_id', 'id');
     }
 
-    //Metetodo que filtra los lotes que tienen stock y estan activos, del mas antiguo.
+    //Metetodo que filtra los lotes que tienen stock y estan activos, del mas antiguo y disponible.
+    /**
+     * Mettodo que filtyara
+     */
     public function  oldestActiveBatch()
     {
         return $this->batches()->where('quantity_remaining', '>', 0)->orderBy('created_at', 'asc')->first();
