@@ -1,5 +1,14 @@
 <?php
 
+/**
+ * conotrolador para la autenticacion de usuarios
+ *
+ * Este controlador encapsula la logica de acceso de un usuario a un aplicativo
+ * utilizando nuestra api Sanctum para manejar las sesiones dentro del sistema.
+ *
+ * @author Juan Alejandro Muñoz Devia
+ */
+
 namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
