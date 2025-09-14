@@ -11,23 +11,22 @@ Use App\Models\ProductProduction;
 class Product extends Model
 {
     protected $table = 'product';
-    
-    protected $fillable = 
+
+    protected $fillable =
     [
-        
         'product_name',
         'unit_price',
     ];
 
-    public function saleProducts(): HasMany 
-    {   
+    public function saleProducts(): HasMany
+    {
         return $this->hasMany(SaleProduct::class, 'product_id');
     }
 
 
-    public function productProductions(): HasMany 
-    {   
+    public function productProductions(): HasMany
+    {
         return $this->hasMany(ProductProduction::class, 'product_id');
     }
-    
+
 }

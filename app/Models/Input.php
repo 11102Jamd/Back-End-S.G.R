@@ -21,23 +21,6 @@ class Input extends Model
         'category'
     ];
 
-    //Metodo para limitar la eliminacion, una receta no queda huerfana
-    protected static function booted()
-    {
-        //Valida el insert para que no se generen resgistros inecesarios a la bd, es como un filtro para hacer los inserts
-        static::saving(function ($input) {
-            if (!in_array(strtolower($input->unit), ['kg', 'g', 'lb', 'l', 'un'])) {
-                throw new \Exception("Unidad no valida para guardar cambios");
-            }
-        });
-        //Antes de confirmar el eliminado lanza la excepcion y bloquea el delete si no cumple con los parametros
-        static::deleting(function ($input) {
-            if ($input->producs()->count() > 0) {
-                throw new \Exception("No puedes eliminar un insumo asociado a una receta");
-            }
-        });
-    }
-
     //Relacion de insumos con los lotes,un insumo puede tener muchos lotes
     public function batches(): HasMany
     {
@@ -56,6 +39,6 @@ class Input extends Model
      */
     public function  oldestActiveBatch()
     {
-        return $this->batches()->where('quantity_remaining', '>', 0)->orderBy('create_at', 'asc')->first();
+        return $this->batches()->where('quantity_remaining', '>', 0)->orderBy('created_at', 'asc')->first();
     }
 }
