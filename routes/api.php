@@ -1,14 +1,14 @@
 <?php
 
-
+use App\Http\Controllers\Auth\AuthController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\InputController;
 use App\Http\Controllers\OrderController;
 use App\Http\Controllers\ProductionController;
 use App\Http\Controllers\RecipeController;
 
-// Route::post('/login', [AuthController::class, 'login']);
-// Route::post('/reset-password', [AuthController::class, 'resetPassword']);
+Route::post('/login', [AuthController::class, 'login']);
+Route::post('/reset-password', [AuthController::class, 'resetPassword']);
 
 // Route::middleware('auth:sanctum')->group(function () {
 //     Route::post('/logout', [AuthController::class, 'logout']);

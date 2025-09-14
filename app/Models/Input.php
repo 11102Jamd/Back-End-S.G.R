@@ -50,6 +50,6 @@ class Input extends Model
     //Metetodo que filtra los lotes que tienen stock y estan activos, del mas antiguo.
     public function  oldestActiveBatch()
     {
-        return $this->batches()->where('quantity_remaining', '>', 0)->orderBy('create_at', 'asc')->first();
+        return $this->batches()->where('quantity_remaining', '>', 0)->orderBy('created_at', 'asc')->first();
     }
 }

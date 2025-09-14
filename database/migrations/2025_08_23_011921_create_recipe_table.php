@@ -14,7 +14,7 @@ return new class extends Migration
         Schema::create('recipe', function (Blueprint $table) {
             $table->id();
             $table->string('recipe_name', 60);
-            $table->decimal('yield_quantity');
+            $table->integer('yield_quantity');
             $table->string('unit', 15);
             $table->timestamps();
         });
