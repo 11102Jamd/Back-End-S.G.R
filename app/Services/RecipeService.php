@@ -5,6 +5,7 @@ namespace App\Services;
 use App\Models\Recipe;
 use App\Models\RecipeIngredient;
 use Illuminate\Support\Facades\DB;
+
 /**
  * Servicio encargado de manejar la lógica de negocio relacionada con recetas.
  *
@@ -33,13 +34,13 @@ class RecipeService
             $recipe = Recipe::create([
                 'recipe_name' => $data['recipe_name'],
                 'yield_quantity' => $data['yield_quantity'],
-                'unit' => $data['unit']
             ]);
             foreach ($data['ingredient'] as $ingredient) {
                 RecipeIngredient::create([
                     'recipe_id' => $recipe->id,
                     'input_id' => $ingredient['input_id'],
                     'quantity_required' => $ingredient['quantity_required'],
+                    'unit_used' => $ingredient['unit_used']
                 ]);
             }
             return $recipe;
@@ -68,17 +69,17 @@ class RecipeService
             $recipe->update([
                 'recipe_name'    => $data['recipe_name'],
                 'yield_quantity' => $data['yield_quantity'],
-                'unit'           => $data['unit']
             ]);
 
             $recipe->recipeIngredients()->delete();
 
-             // Crear nuevos ingredientes
+            // Crear nuevos ingredientes
             foreach ($data['ingredient'] as $ingredient) {
                 RecipeIngredient::create([
                     'recipe_id'         => $recipe->id,
                     'input_id'          => $ingredient['input_id'],
                     'quantity_required' => $ingredient['quantity_required'],
+                    'unit_used' => $ingredient['unit_used']
                 ]);
             }
 

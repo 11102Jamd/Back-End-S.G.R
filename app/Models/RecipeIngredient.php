@@ -21,6 +21,7 @@ class RecipeIngredient extends Model
         'recipe_id',
         'input_id',
         'quantity_required',
+        'unit_used'
     ];
 
     /**

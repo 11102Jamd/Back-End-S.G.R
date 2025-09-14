@@ -30,10 +30,10 @@ class RecipeController extends BaseCrudController
     protected $validationRules = [
         'recipe_name' => 'required|string|max:50',
         'yield_quantity' => 'required|integer|max:100',
-        'unit' => 'required|string|max:10',
         'ingredient' => 'required|array|min:1',
         'ingredient.*.input_id' => 'required|exists:input,id',
-        'ingredient.*.quantity_required' => 'required|numeric|min:0.001'
+        'ingredient.*.quantity_required' => 'required|numeric|min:0.001',
+        'ingredient.*.unit_used' => 'required|string|max:8'
     ];
     /**
      * Inyecta la dependencia de RecipeService.

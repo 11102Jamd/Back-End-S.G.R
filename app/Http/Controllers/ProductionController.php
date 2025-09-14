@@ -43,7 +43,7 @@ class ProductionController extends Controller
     public function index()
     {
         try {
-            $production = Production::with('recipe','productionConsumptions')->orderBy('id', 'desc')->get();
+            $production = Production::with('recipe', 'productionConsumptions')->orderBy('id', 'desc')->get();
             return response()->json($production);
         } catch (\Throwable $th) {
             return response()->json([
@@ -95,12 +95,11 @@ class ProductionController extends Controller
      */
     public function store(Request $request)
     {
-        $validated = $request->validate([
-            'recipe_id' => 'required|exists:recipe,id',
-            'quantity_to_produce' => 'required|numeric|min:0.001'
-        ]);
-
         try {
+            $validated = $request->validate([
+                'recipe_id' => 'required|exists:recipe,id',
+                'quantity_to_produce' => 'required|numeric|min:0.001'
+            ]);
             $production = $this->productionService->executeProduction(
                 $validated['recipe_id'],
                 $validated['quantity_to_produce']

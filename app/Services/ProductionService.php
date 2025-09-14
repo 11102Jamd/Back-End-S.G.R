@@ -6,7 +6,9 @@ use App\Models\InputBatch;
 use App\Models\Production;
 use App\Models\ProductionConsumption;
 use App\Models\Recipe;
+use Exception;
 use Illuminate\Support\Facades\DB;
+
 /**
  * Servicio ProductionService
  *
@@ -21,23 +23,48 @@ use Illuminate\Support\Facades\DB;
 class ProductionService
 {
     /**
-     * Calcula el costo de un lote según la cantidad de insumo que se va a usar.
+     * Calcula el costo de un lote según la cantidad utilizada.
      *
-     * Convierte la cantidad utilizada a la unidad correspondiente del lote
-     * (kg, lb, g, l, un) y multiplica por el precio unitario del lote.
-     *
-     * @param float $gramsUsed Cantidad de insumo utilizada
+     * @param float $gramsUsed Cantidad utilizada en gramos (estándar)
      * @param InputBatch $batch Lote del insumo
-     * @return float Costo del lote
+     * @return float Costo del lote según su unidad y precio
      */
-    protected function calculateBatchCost(float $gramsUsed, InputBatch $batch): float
+    protected function calculateBatchCost(float $gramsUsed, InputBatch $batch) {
+        $originalUnit = $batch->unit;
+        $originalUnitUsed = $this->convetFromStandardUnit($gramsUsed, $originalUnit);
+        return $originalUnitUsed * $batch->unit_price;
+    }
+    /**
+     *  Convierte la cantidad estándar (gramos/mililitros/unidades) a la unidad original del lote.
+     *
+     * Soporta: kg, g, lb, oz, l, ml, un
+     * Lanza excepción si la unidad no es válida.
+     *
+     * @param float $standarAmount Cantidad estándar (gramos/mililitros/unidades)
+     * @param string $originalUnit Unidad original del lote
+     * @return float Cantidad en la unidad original
+     * @throws Exception
+     */
+    protected function convetFromStandardUnit(float $standarAmount, string $originalUnit)
     {
-        $unit = strtolower($batch->input->unit);
-        $conversionRates = ['kg' => 1000, 'lb' => 453.592, 'g' => 1, 'l' => 1000, 'un' => 1];
-        $gramsPerUnit = $conversionRates[$unit] ?? 1;
-        $unitsUsed = $gramsUsed / $gramsPerUnit;
-
-        return $unitsUsed * $batch->unit_price;
+        $originalUnit = strtolower($originalUnit);
+        if (in_array($originalUnit, ['kg', 'g', 'lb', 'oz'])) {
+            return match ($originalUnit) {
+                'kg' => $standarAmount / 1000,
+                'g' => $standarAmount,
+                'lb' => $standarAmount / 453.592,
+                'oz' => $standarAmount / 28.349
+            };
+        } elseif (in_array($originalUnit, ['l', 'ml'])) {
+            return match ($originalUnit) {
+                'l' => $standarAmount / 1000,
+                'ml' => $standarAmount
+            };
+        } elseif ($originalUnit=='un') {
+            return $standarAmount;
+        } else {
+            throw new Exception("unidad original no valida");
+        }
     }
 
     /**
@@ -73,7 +100,7 @@ class ProductionService
             $consumedGram = min($batch->quantity_remaining, $remaining);
             $batchCost = $this->calculateBatchCost($consumedGram, $batch);
 
-             // Registrar el consumo en la base de datos
+            // Registrar el consumo en la base de datos
             ProductionConsumption::create([
                 'production_id' => $productionId,
                 'input_id' => $inputId,
@@ -107,7 +134,7 @@ class ProductionService
         ];
     }
 
-/**
+    /**
      * Ejecuta la producción de una receta según la cantidad solicitada.
      *
      *
@@ -116,7 +143,7 @@ class ProductionService
      *-Crea un registro inicial de producción con costos en cero.
      *-Itera sobre cada ingrediente y registra el consumo de los lotes disponibles.
      *-Calcula el costo total y el precio por unidad.
-     *-Devuelve la producción con los consumos asociados cargados.
+     *-Devuelve la producción con los consumos asociados.
      *
      * @param int $recipeId ID de la receta
      * @param float $quantityToProduce Cantidad de producto a producir
