@@ -6,31 +6,39 @@ use App\Models\Order;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
+ * Fábrica para generar instancias del modelo Order.
+ *
+ * Esta clase permite crear registros ficticios de órdenes de compra
+ * que incluyen proveedor, fecha y total del pedido. Es útil para
+ * pruebas automatizadas o para cargar datos de ejemplo en seeders.
+ *
  * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\Order>
  */
 class OrderFactory extends Factory
 {
     /**
-     * Define the model's default state.
+     * Modelo al que está vinculada la fábrica.
      *
-     * @return array<string, mixed>
+     * @var class-string<\App\Models\Order>
      */
-
-    //
     protected $model = Order::class;
 
-    //Define el estado predeterminado del modelo
+    /**
+     * Define el estado predeterminado del modelo Order.
+     *
+     * Este método genera datos ficticios para los atributos:
+     * - supplier_name: nombre de empresa proveedora aleatorio.
+     * - order_date: fecha del pedido en formato YYYY-MM-DD.
+     * - order_total: monto total de la orden con dos decimales.
+     *
+     * @return array<string, mixed> Datos simulados para un Order.
+     */
     public function definition(): array
     {
         return [
-            //Genera un nombre de proveedor aleatorio
-            'supplier_name' => $this->faker->company(), //Nombre de la empresa proveedora
-
-            //Genera una fecha aleatoria para el pedido
-            'order_date' => $this->faker->date(),//Fecha del pedido
-
-            //Genera un total de pedido aleatorio entre 50 y 500
-            'order_total' => $this->faker->randomFloat(2, 50, 500),//total del pedido, con 2 decimales
+            'supplier_name' => $this->faker->company(),
+            'order_date'    => $this->faker->date(),
+            'order_total'   => $this->faker->randomFloat(2, 50, 500),
         ];
     }
 }

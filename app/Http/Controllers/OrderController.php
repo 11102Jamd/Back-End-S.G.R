@@ -8,17 +8,36 @@ use App\Models\Input;
 use App\Services\OrderService;
 use Illuminate\Http\Request;
 
+/**
+ * Controlador para la gestión de órdenes de compra.
+ *
+ * Este controlador maneja las operaciones principales del módulo de compras,
+ * incluyendo la creación, validación y listado de órdenes con sus lotes asociados.
+ *
+ * @package App\Http\Controllers
+ */
 class OrderController extends BaseCrudController
 {
-
-    //Modelo que maneja el crud principal del modulo
+    /**
+     * Modelo que maneja el CRUD principal del módulo.
+     *
+     * @var string
+     */
     protected $model = Order::class;
 
-    //Servicio generado para manejar la logica del negocio
+    /**
+     * Servicio que contiene la lógica de negocio para órdenes.
+     *
+     * @var \App\Services\OrderService
+     */
     protected $orderService;
 
-    //Reglas de validacion para que todos los datos sean correctos
-    protected $validationRules  = [
+    /**
+     * Reglas de validación para garantizar la integridad de los datos.
+     *
+     * @var array<string, string>
+     */
+    protected $validationRules = [
         'supplier_name' => 'required|string|max:50',
         'order_date' => 'required|date',
         'items' => 'required|array|min:1',
@@ -27,33 +46,49 @@ class OrderController extends BaseCrudController
         'items.*.unit_price' => 'required|numeric|min:0.01'
     ];
 
-    //Es la inyeccion de dependencias para pasar le una solicitud al servicio
+    /**
+     * Inyección de dependencias para el servicio de órdenes.
+     *
+     * @param  \App\Services\OrderService  $orderService
+     */
     public function __construct(OrderService $orderService)
     {
         $this->orderService = $orderService;
     }
 
-    //Metodo que lista los lotes asociados a las ordenes generadas, Get Orders
+    /**
+     * Lista todas las órdenes con sus lotes asociados.
+     *
+     * @return \Illuminate\Http\JsonResponse
+     */
     public function index()
     {
         try {
-            $orders = $this->model::with('batches')->orderBy('order_date', 'desc')->get();
+            $orders = $this->model::with('batches')
+                ->orderBy('order_date', 'desc')
+                ->get();
+
             return response()->json($orders);
         } catch (\Throwable $th) {
             return response()->json([
-                'message' => 'error al obtener las ordenes',
+                'message' => 'Error al obtener las órdenes',
                 'error' => $th->getMessage()
             ], 500);
         }
     }
 
-    //Metodo que valida y crea una orden de compra, Post Orders
+    /**
+     * Crea una nueva orden de compra con validación de insumos y lotes.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @return \Illuminate\Http\JsonResponse
+     */
     public function store(Request $request)
     {
         try {
             $validated = $this->validationRequest($request);
 
-            //Ciclo para recorrer los itmes de la compra para validar existencia y unidades de medida
+            // Validación de insumos y sus unidades de medida
             foreach ($validated['items'] as $item) {
                 $input = Input::find($item['input_id']);
 
@@ -61,14 +96,16 @@ class OrderController extends BaseCrudController
                     throw new \Exception("El insumo con ID {$item['input_id']} no existe");
                 }
 
-                //Valida las unidades de medida dentro del array
                 if (!in_array(strtolower($input->unit), ['kg', 'g', 'lb', 'l', 'oz'])) {
-                    throw new \Exception("Unidad no válida para el insumo: {$input->unit}. Use: kg, g, l, lb, oz");
+                    throw new \Exception(
+                        "Unidad no válida para el insumo: {$input->unit}. Use: kg, g, l, lb, oz"
+                    );
                 }
             }
 
-            //Se le asigna al servicio la orden de crear la compra y sus respectivos lotes
+            // Delegación de la creación de la orden al servicio
             $order = $this->orderService->createOrderWithBatches($validated);
+
             return response()->json([
                 'message' => 'Orden creada exitosamente',
                 'data' => $order,
@@ -76,25 +113,29 @@ class OrderController extends BaseCrudController
             ], 201);
         } catch (\Throwable $th) {
             return response()->json([
-                'message' => 'error al crear la orden',
+                'message' => 'Error al crear la orden',
                 'error' => $th->getMessage()
             ], 422);
         }
     }
 
-    //Declara un método público que recibe un parámetro $id
+    /**
+     * Muestra los detalles de una orden de compra por ID.
+     *
+     * Incluye la carga anticipada de las relaciones `batches` e `input`.
+     *
+     * @param  int  $id  ID de la orden de compra.
+     * @return \Illuminate\Http\JsonResponse
+     */
     public function show($id)
     {
         try {
-            // Intenta buscar una orden por su ID utilizando Eloquent
-            // Se cargan de forma anticipada las relaciones 'batches' e 'input' asociadas a la orden de compra
             $order = Order::with('batches.input')->findOrFail($id);
-            // Devuelve la orden encontrada como respuesta en formato JSON
+
             return response()->json($order);
         } catch (\Throwable $th) {
-            // Captura cualquier excepción que ocurra durante la búsqueda de la orden de compra
             return response()->json([
-                'message' => 'error al optener la orden',
+                'message' => 'Error al obtener la orden',
                 'error' => $th->getMessage()
             ]);
         }
