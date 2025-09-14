@@ -31,7 +31,16 @@ class InputController extends BaseCrudController
         }
     }
 
-    //Metodo que permite actualizar un insumo existente en la bd
+    /**
+     * Actualiza un insumo existente.
+     *
+     * Modifica la validación del campo `name` para permitir
+     * que el mismo insumo mantenga su nombre sin conflicto de unicidad.
+     *
+     * @param \Illuminate\Http\Request $request Datos de la solicitud.
+     * @param int $id ID del insumo a actualizar.
+     * @return \Illuminate\Http\JsonResponse insumo actualizado o error de validación.
+     */
     public function update(Request $request, $id)
     {
         try {
@@ -42,6 +51,55 @@ class InputController extends BaseCrudController
                 'error' => 'No se pudo actualizar el insumo',
                 'message' => $th->getMessage()
             ], 422);
+        }
+    }
+
+    /**
+     * desabilita un insumo en la base de datos pero no lo elimina
+     * con el fin dee que si no lo elimina no se eliminen sus registros en cascada
+     *
+     * @param int $id ID del insumo a inhabilitar.
+     * @return \Illuminate\Http\JsonResponse insumo inhabilitado o error de validación.
+     */
+    public function disable($id)
+    {
+        try {
+            $input = $this->model::findOrFail($id);
+            $input->delete();
+            return response()->json([
+                'message' => 'insumo inhabilitado correctamente',
+            ], 200);
+        } catch (\Throwable $th) {
+            return response()->json([
+                'error' => 'error no sep udo encontrar el insumo con ese registro',
+                'message' => $th->getMessage()
+            ], 404);
+        }
+    }
+
+
+    public function enable($id)
+    {
+        try {
+            $input = $this->model::withTrashed()->findOrFail($id);
+
+            if ($input->trashed()) {
+                $input->restore();
+                return response()->json([
+                    'message' => 'insumo reactivado correctamente',
+                    'input_id' => $id
+                ], 200);
+            }
+
+            return response()->json([
+                'message' => 'El insumo ya estaba activo',
+                'input_id' => $id
+            ], 200);
+        } catch (\Throwable $th) {
+            return response()->json([
+                'error' => 'No se pudo reactivar el insumo',
+                'message' => $th->getMessage()
+            ], 404);
         }
     }
 }

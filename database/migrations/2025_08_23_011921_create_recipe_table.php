@@ -15,6 +15,7 @@ return new class extends Migration
             $table->id();
             $table->string('recipe_name', 60);
             $table->decimal('yield_quantity');
+            $table->softDeletes();
             $table->timestamps();
         });
     }

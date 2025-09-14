@@ -72,7 +72,7 @@
             <tr class="order-header">
                 <td colspan="4">
                     Producción N° {{ $production->id }} -
-                    Receta: {{ $production->recipe->name ?? 'Sin Receta' }} -
+                    Receta: {{ $production->recipe->recipe_name ?? 'Sin Receta' }} -
                     Producto: {{ $firstProductProduction->product->product_name ?? 'Sin producto' }} -
                     Fecha: {{ Carbon\Carbon::parse($production->production_date)->format('d/m/Y') }}
                     Ganancia: {{$firstProductProduction->profit_margin_porcentage ?? 'Sin Ganancia'}} %
