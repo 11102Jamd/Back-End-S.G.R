@@ -5,6 +5,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    {{-- Estilos basicos para el PDF --}}
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -73,6 +74,7 @@
 </head>
 
 <body>
+    {{-- Encabeezado del Reporte de Compras --}}
     <div class="header">
         <div class="title">Reporte de Compras</div>
         <div class="period">
@@ -84,6 +86,7 @@
         </div>
     </div>
 
+    {{-- Iterar sobre todas las ordenes --}}
     @foreach ($orders as $order)
         <table>
             <tr class="order-header">
@@ -100,6 +103,7 @@
                 <th>Lote N°</th>
             </tr>
 
+            {{-- Detalle de Inusmos --}}
             @foreach ($order->batches as $batch)
                 <tr>
                     <td>{{ $batch->input->name }}</td>
@@ -121,6 +125,7 @@
         @endif
     @endforeach
 
+    {{-- Total de las compras realizadas --}}
     <div class="grand-total">
         Total de las Compras Realizadas: ${{ number_format($totalOrders, 0) }}
     </div>
