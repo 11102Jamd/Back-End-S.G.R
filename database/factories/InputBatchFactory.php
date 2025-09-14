@@ -3,24 +3,37 @@
 namespace Database\Factories;
 
 use Illuminate\Database\Eloquent\Factories\Factory;
+use App\Models\InputBatch;
 use App\Models\Order;
-use App\Models\Input;
 
+/**
+ * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\InputBatch>
+ */
 class InputBatchFactory extends Factory
 {
+    /**
+     * Define the model's default state.
+     *
+     * @return array<string, mixed>
+     */
+
+
+    //Especifica que esta fabrica esta vinculada al modelo InputBatch
+    protected $model = InputBatch::class;
+
+    //Define el estado predeterminado del modelo
     public function definition(): array
     {
-        $quantity = $this->faker->randomFloat(3, 10, 100);
-
+        //Crea un nuevo pedido asociado a este lote utilizando la fàbrica de Order
         return [
             'order_id' => Order::factory(),
-            'input_id' => Input::factory(),
-            'quantity_total' => $quantity,
-            'quantity_remaining' => $quantity,
-            'unit_price' => $this->faker->randomFloat(3, 1, 50),
-            'subtotal_price' => fn (array $attrs) => $attrs['quantity_total'] * $attrs['unit_price'],
-            'batch_number' => $this->faker->unique()->numberBetween(1000, 9999),
-            'received_date' => $this->faker->date(),
+            'input_id' => 1,
+            'quantity_total' => $this->faker->randomFloat(2, 1, 10),
+            'quantity_remaining' => $this->faker->randomFloat(2, 1, 10),
+            'unit_price' => $this->faker->randomFloat(2, 1, 100),
+            'subtotal_price' => $this->faker->randomFloat(2, 10, 1000),
+            'batch_number' => $this->faker->numberBetween(1, 100),
+            'received_date' => now()
         ];
     }
 }

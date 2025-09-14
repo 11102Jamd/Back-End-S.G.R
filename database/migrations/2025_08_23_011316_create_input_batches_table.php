@@ -16,7 +16,9 @@ return new class extends Migration
             $table->foreignId('order_id')->constrained('order')->onDelete('cascade');
             $table->foreignId('input_id')->constrained('input')->onDelete('cascade');
             $table->decimal('quantity_total', 10,3);
+            $table->string('unit', 10);//lb,kg,g,ml,un,l
             $table->decimal('quantity_remaining', 10,3);
+            $table->string('unit_converted', 10);// g,ml,un
             $table->decimal('unit_price', 10,3);
             $table->decimal('subtotal_price',10,3);
             $table->integer('batch_number');
