@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 use App\Models\Recipe;
 use App\Models\ProductionConsumption;
+use App\Models\ProductProduction;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -12,6 +13,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 class Production extends Model
 {
     use HasFactory;
+
     protected $table = 'production';
 
     protected $fillable = [
@@ -31,5 +33,10 @@ class Production extends Model
     public function productionConsumptions(): HasMany
     {
         return $this->hasMany(ProductionConsumption::class, 'production_id');
+    }
+
+    public function productProductions(): HasMany
+    {
+        return $this->hasMany(ProductProduction::class, 'production_id');
     }
 }

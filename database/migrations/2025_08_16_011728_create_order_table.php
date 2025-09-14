@@ -11,20 +11,21 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('product', function (Blueprint $table) {
-            $table->id();
-            $table->string('product_name', 50);
-            $table->decimal('unit_price', 10,3);
+        Schema::create('order', function (Blueprint $table) {
+            $table->id('ID_order');
+            $table->foreignId('ID_user')->constrained('users')->cascadeOnDelete()->cascadeOnUpdate();
+            $table->dateTime('orderDate');
+            $table->decimal('orderTotal', 10, 3);
             $table->timestamps();
-            
         });
     }
 
     /**
-     * Reverse the migrations.
+     * Reverse the migrations.  
      */
     public function down(): void
     {
-        Schema::dropIfExists('product');
+        Schema::dropIfExists('order');
     }
 };
+
