@@ -6,9 +6,10 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 
 use App\Http\Controllers\globalCrud\BaseCrudController;
+use App\Models\Product;
 use App\Services\ProductProductionService;
 
-class Product extends BaseCrudController
+class ProductController extends BaseCrudController
 {
     protected $model = Product::class;
 

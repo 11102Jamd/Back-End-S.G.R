@@ -1,5 +1,9 @@
 <?php
 
+/**
+ * Archivo crado por Juan David Plazas Hernandez
+ */
+
 namespace App\Http\Controllers;
 
 use App\Models\Input;
@@ -8,12 +12,29 @@ use App\Models\Order;
 use App\Services\OrderService;
 use Illuminate\Http\Request;
 
+/**
+ * Declaramos la clase OrderController que herdea de su clase padre
+ * BaseCrudController
+ */
 class OrderController extends BaseCrudController
 {
+    /**
+     * Modelo asociado.
+     *
+     * @var string
+     */
     protected $model = Order::class;
 
+    /**
+     * Definimos una propiedad que almacena el objeto orderService
+     */
     protected $orderService;
 
+    /**
+     * Reglas de validación para la compra
+     *
+     * @var array<string, string>
+     */
     protected $validationRules = [
         'supplier_name' => 'required|string|max:255',
         'order_date' => 'required|date',
@@ -24,11 +45,26 @@ class OrderController extends BaseCrudController
         'items.*.unit_price' => 'required|numeric|min:0.01'
     ];
 
+    /**
+     * Inyecta el objeto del servicio orderService
+     *
+     * Este método se encarga de recibir e inyectar el objeto de PdfService
+     * dentro del controlador orderController, para poder realizar el registro adecuado
+     * de las compras segun las reglas de validacion que regiqueran.
+     *
+     * @param \App\Services\PdfService $pdfService Instancia del servicio de PDF.
+     * @return void
+     */
     public function __construct(OrderService $orderService)
     {
         $this->orderService = $orderService;
     }
 
+    /**
+     * este metodo index devuelve todos las compras realizadas
+     *
+     * @return \Illuminate\Http\JsonResponse Devuelve la lista de Usuarios
+     */
     public function index()
     {
         try {
@@ -45,7 +81,12 @@ class OrderController extends BaseCrudController
         }
     }
 
-
+    /**
+     * este metodo index devuelve un rfegiostro en especifico por medio de su id
+     *
+     * @param int $id el id del registro a mostrar
+     * @return \Illuminate\Http\JsonResponse Devuelve la lista de Usuarios
+     */
     public function show($id)
     {
         try {
@@ -59,6 +100,19 @@ class OrderController extends BaseCrudController
         }
     }
 
+    /**
+     * Almacena una nueva orden de compra junto con sus lotes asociados.
+     *
+     * Este método realiza los siguientes pasos:
+     * 1. Valida los datos de la solicitud mediante `validationRequest`.
+     * 2. Verifica que cada insumo indicado exista en la base de datos.
+     * 3. Crea la orden y los lotes correspondientes usando `orderService->createOrderWithBatches`.
+     * 4. Retorna una respuesta JSON con la compra creada y el total de la compra.
+     *
+     * @param \Illuminate\Http\Request $request Solicitud HTTP con las reglas de validacion
+     * @return \Illuminate\Http\JsonResponse devuelve una respuesta en json con el cuerpo de la compra
+     * @throws \Exception Si algún insumo no existe o falla la creación de la compra.
+     */
     public function store(Request $request)
     {
         try {
