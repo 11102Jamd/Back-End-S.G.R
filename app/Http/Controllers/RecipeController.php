@@ -8,7 +8,7 @@ use App\Services\RecipeService;
 use Illuminate\Http\Request;
 /**
  * Controlador encargado de gestionar las recetas.
- * 
+ *
  * Incluye métodos para mostrar, crear, actualizar y eliminar recetas.
  * Extiende de BaseCrudController para reutilizar lógica CRUD común.
  */
@@ -114,18 +114,19 @@ class RecipeController extends BaseCrudController
      * @param int $id
      * @return \Illuminate\Http\JsonResponse
      */
-    public function destroy($id)
+    public function disable($id)
     {
         try {
-            $this->recipeService->deleteRecipe($id);
+            $recipe = $this->model::findOrFail($id);
+            $recipe->delete();//Ejecuta softdelete y no un delete como tal
             return response()->json([
-                'message' => 'Receta eliminada con éxito'
+                'message' => 'receta inhabilitado temporalmete',
             ], 200);
         } catch (\Throwable $th) {
             return response()->json([
-                'error' => 'No se pudo eliminar la receta',
+                'error' => 'error no sep udo encontrar el usuario con ese registro',
                 'message' => $th->getMessage()
-            ], 422);
+            ], 404);
         }
     }
 }

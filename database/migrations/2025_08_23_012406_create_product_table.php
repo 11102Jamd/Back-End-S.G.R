@@ -15,8 +15,9 @@ return new class extends Migration
             $table->id();
             $table->string('product_name', 50);
             $table->decimal('unit_price', 10,3);
+            $table->softDeletes();
             $table->timestamps();
-            
+
         });
     }
 

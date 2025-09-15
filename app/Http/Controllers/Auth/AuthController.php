@@ -58,7 +58,7 @@ class AuthController extends Controller
         } catch (\Throwable $th) {
             return response()->json([
                 'message' => $th->getMessage(),
-            ]);
+            ], 422);
         }
     }
 
@@ -130,7 +130,7 @@ class AuthController extends Controller
             return response()->json([
                 'message' => 'Error al restablecer la contraseña',
                 'error' => $th->getMessage()
-            ], 500);
+            ], 422);
         }
     }
 }

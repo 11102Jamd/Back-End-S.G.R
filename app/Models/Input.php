@@ -7,10 +7,11 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 use App\Models\InputBatch;
 use App\Models\ProductionConsumption;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Input extends Model
 {
-    use HasFactory;
+    use HasFactory, SoftDeletes;
 
     //Nombre de la tabla asociada a la bd
     protected $table = 'input';
@@ -20,6 +21,8 @@ class Input extends Model
         'name',
         'category'
     ];
+
+    protected $dates = ['deleted_at'];
 
     //Metodo para limitar la eliminacion, una receta no queda huerfana
 

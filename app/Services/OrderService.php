@@ -9,6 +9,23 @@ use Illuminate\Support\Facades\DB;
 
 class OrderService
 {
+    /**
+     * Crea un nuevo lote (batch) para un insumo a partir de los datos de la orden.
+     *
+     * Este método realiza los siguientes pasos:
+     * 1. Obtiene el insumo correspondiente según su ID.
+     * 2. Valida que la unidad proporcionada sea compatible con la categoría del insumo.
+     * 3. Convierte la cantidad a la unidad estándar según la categoría del insumo.
+     * 4. Calcula la cantidad restante, precio unitario, subtotal y número de lote.
+     * 5. Crea y devuelve un registro en la tabla de lotes (InputBatch).
+     *
+     * @param int $orderId el id de la orden de compra
+     * @param array $itemData Arreglo con los datos del insumo
+     * @return InputBatch  El lote creado con la informacion correspondiente
+     *
+     * @throws \Illuminate\Database\Eloquent\ModelNotFoundException Si el insumo no existe.
+     * @throws \Exception Si la unidad no es compatible con la categoría del insumo.
+     */
     protected function createInputBatch(int $orderId, array $itemData): InputBatch
     {
         $input = Input::findOrFail($itemData['input_id']);
@@ -34,12 +51,26 @@ class OrderService
         ]);
     }
 
+    /**
+     * Valida la unidad de medida correspondiente a la categoria a lq eu pertenece el insumo
+     *
+     * categorias:
+     * Liquido: recibe L o ml
+     * solido_no_con : recibe kg,lb,oz,g
+     * solido_con: recibe unicamente un
+     *
+     * @param string $category la categoria del insumo que toca identificar
+     * @param string $unit la unidad a identficar correpondiente a la categoria del insumo
+     *
+     * @return array ddevuelve un arregklo con la cantidad convertida y su unidad estandar
+     * @throws \Exception dispara una excepcion si la unidad o categoria no son validas
+     */
     protected function validateUnitForCategory(string $category, string $unit): void
     {
         $unit = strtolower($unit);
         $category = strtolower($category);
 
-        $validUnits = match($category) {
+        $validUnits = match ($category) {
             'liquido' => ['l', 'ml'],
             'solido_con' => ['un'],
             'solido_no_con' => ['kg', 'g', 'lb', 'oz'],
@@ -51,6 +82,22 @@ class OrderService
         }
     }
 
+
+    /**
+     * conveiirte una cantidad a la unidad estandar segun la categoria del Insumo
+     *
+     * categorias:
+     * Liquido: convierte a ml desde L o ml
+     * solido_no_con : convierte a g desde g,kg,lb,oz etc.
+     * solido_con : convierte a un (unidad) sin necesidad  de hacver conversion
+     *
+     * @param float $quantity la canidad a convertir
+     * @param string $unit la unidad a envaluar para la conversion
+     * @param string $category la categoria del insumo que toca identificar
+     *
+     * @return array devuelve un arreglo con la cantidad convertida y su unidad estandar
+     * @throws \Exception dispara una excepcion si la unidad o categoria no son validas
+     */
     protected function convertToStandardUnit(float $quantity, string $unit, string $category): array
     {
         $unit = strtolower($unit);
@@ -89,6 +136,15 @@ class OrderService
         }
     }
 
+    /**
+     * Obtiene el siguente numero del Lote a traves del id del insumo
+     *
+     * Este método busca el último lote registrado para un insumo específico
+     * y devuelve el siguiente número de lote disponible. Si no existe ningún lote
+     * previo, retorna 1.
+     * @param int $inputId el id del insumo
+     * @return int $lastBatch devuelve el sigueinte numerro del lote dispouble
+     */
     protected function getNextBatchNumber(int $inputId): int
     {
         $lastBatch = InputBatch::where('input_id', $inputId)
@@ -98,6 +154,26 @@ class OrderService
         return $lastBatch ? $lastBatch->batch_number + 1 : 1;
     }
 
+
+    /**
+     *  Crea una orden junto con sus lotes (batches) asociados.
+     *
+     * Este método realiza las siguientes acciones:
+     * 1. Calcula el total de la orden sumando el subtotal de cada insumo.
+     * 2. Crea la orden principal en la base de datos.
+     * 3. Crea los lotes correspondientes a cada insumo de la orden usando `createInputBatch`.
+     * 4. Retorna la orden con sus lotes cargados.
+     *
+     * Todas las operaciones se ejecutan dentro de una transacción para garantizar
+     * consistencia en caso de errores.
+     *
+     * @param array $orderData Arreglo con los datos de la compra
+     *
+     *  @return Order La orden creada con sus lotes relacionados cargados.
+     *
+     * @throws \Exception Si ocurre un error durante la creación de la orden o lotes,
+     *                    la transacción será revertida automáticamente.
+     */
     public function createOrderWithBatches(array $orderData): Order
     {
         return DB::transaction(function () use ($orderData) {

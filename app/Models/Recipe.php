@@ -5,6 +5,8 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\SoftDeletes;
+
 /**
  * Modelo Recipe
  *
@@ -14,15 +16,16 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
  */
 class Recipe extends Model
 {
-    use HasFactory;
+    use HasFactory, SoftDeletes;
 
     protected $table = 'recipe';
 
     protected $fillable = [
         'recipe_name',
         'yield_quantity',
-        'unit',
     ];
+
+    protected $dates = ['deleted_at'];
 
     /**
      * Relación: Obtiene los ingredientes asociados a la receta.
@@ -34,7 +37,7 @@ class Recipe extends Model
         return $this->hasMany(RecipeIngredient::class, 'recipe_id');
     }
 
-        /**
+    /**
      * Relación: Obtiene todas las producciones que se han hecho con esta receta.
      *
      * @return HasMany

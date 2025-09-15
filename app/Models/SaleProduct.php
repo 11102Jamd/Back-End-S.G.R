@@ -10,8 +10,8 @@ Use App\Models\Product;
 class SaleProduct extends Model
 {
     protected $table = 'sale_product';
-    
-    protected $fillable = 
+
+    protected $fillable =
     [
         'sale_id',
         'product_id',
@@ -19,7 +19,7 @@ class SaleProduct extends Model
         'subtotal_price',
     ];
 
-    Public function sale(): BelongsTo 
+    Public function sale(): BelongsTo
     {
         return $this->belongsTo(Sale::class, 'sale_id');
     }
