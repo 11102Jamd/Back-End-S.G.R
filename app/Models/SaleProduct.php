@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 Use App\Models\Sale;
 Use App\Models\Product;
 
+//creo la clase SaleProduct que extiende de Model
 class SaleProduct extends Model
 {
     protected $table = 'sale_product';
@@ -19,6 +20,7 @@ class SaleProduct extends Model
         'subtotal_price',
     ];
 
+    // Definir las relaciones con otros modelos
     Public function sale(): BelongsTo
     {
         return $this->belongsTo(Sale::class, 'sale_id');

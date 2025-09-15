@@ -8,6 +8,7 @@ use App\Models\SaleProduct;
 use App\Models\ProductProduction;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
+//creo la clase Product que extiende de Model
 class Product extends Model
 {
     use SoftDeletes;
@@ -21,7 +22,8 @@ class Product extends Model
     ];
 
     protected $dates = ['deleted_at'];
-
+    
+    // Definir las relaciones con otros modelos
     public function saleProducts(): HasMany
     {
         return $this->hasMany(SaleProduct::class, 'product_id');

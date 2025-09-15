@@ -8,6 +8,7 @@ use App\Http\Controllers\globalCrud\BaseCrudController;
 use App\Models\Product;
 use App\Services\ProductProductionService;
 
+//creo la clase ProductController que extiende de BaseCrudController
 class ProductController extends BaseCrudController
 {
     protected $model = Product::class;
@@ -19,6 +20,7 @@ class ProductController extends BaseCrudController
         'unit_price' => 'required|numeric|min:0',
     ];
 
+    //constructor que inyecta la dependencia ProductProductionService
     public function __construct(ProductProductionService $productProductionService)
     {
         $this->productProductionService = $productProductionService;
@@ -48,6 +50,8 @@ class ProductController extends BaseCrudController
      * @param int $id ID del producto a actualizar.
      * @return \Illuminate\Http\JsonResponse producto actualizado o error de validación.
      */
+    
+    //estoy sobreescribiendo el metodo update del BaseCrudController
     public function update(Request $request, $id)
     {
         try {
@@ -61,6 +65,7 @@ class ProductController extends BaseCrudController
         }
     }
 
+    // metodo para vincular una producción a un producto
     public function linkProductionToProduct(Request $request)
     {
         $validated = $request->validate([
@@ -109,7 +114,7 @@ class ProductController extends BaseCrudController
         }
     }
 
-
+    // metodo para habilitar un producto que fue deshabilitado
     public function enable($id)
     {
         try {

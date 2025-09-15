@@ -9,7 +9,7 @@ use App\Models\Sale;
 use App\Models\Product;
 use App\Models\SaleProduct;
 
-
+ 
 class SaleService 
 {
     private function getAvailableStockSafe(int $productId): float
