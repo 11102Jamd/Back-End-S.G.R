@@ -16,7 +16,7 @@ class ProductController extends BaseCrudController
     protected $productProductionService;
 
     protected $validationRules = [
-        'product_name' => 'required|string|max:255|unique:product,name',
+        'product_name' => 'required|string|max:60|unique:product,product_name',
         'unit_price' => 'required|numeric|min:0',
     ];
 
@@ -28,11 +28,7 @@ class ProductController extends BaseCrudController
     public function index()
     {
         try {
-            $product = $this->model::with(['productProductions' => function ($query) {
-                $query->orderBy('id', 'desc')->take(1);
-            }, 'productProductions.production'])
-                ->orderBy('id', 'desc')
-                ->first();
+            $product = $this->model::orderBy('id','desc')->get();
 
             return response()->json($product);
         } catch (\Throwable $th) {
@@ -56,7 +52,7 @@ class ProductController extends BaseCrudController
     public function update(Request $request, $id)
     {
         try {
-            $this->validationRules['product_name'] = 'required|string|unique:product,name,' . $id;
+            $this->validationRules['product_name'] = 'required|string|unique:product,product_name,' . $id;
             parent::update($request, $id);
         } catch (\Throwable $th) {
             return response()->json([
