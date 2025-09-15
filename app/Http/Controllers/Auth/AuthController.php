@@ -1,5 +1,14 @@
 <?php
 
+/**
+ * conotrolador para la autenticacion de usuarios
+ *
+ * Este controlador encapsula la logica de acceso de un usuario a un aplicativo
+ * utilizando nuestra api Sanctum para manejar las sesiones dentro del sistema.
+ *
+ * @author Juan Alejandro Muñoz Devia
+ */
+
 namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
@@ -49,7 +58,7 @@ class AuthController extends Controller
         } catch (\Throwable $th) {
             return response()->json([
                 'message' => $th->getMessage(),
-            ]);
+            ], 422);
         }
     }
 
@@ -121,7 +130,7 @@ class AuthController extends Controller
             return response()->json([
                 'message' => 'Error al restablecer la contraseña',
                 'error' => $th->getMessage()
-            ], 500);
+            ], 422);
         }
     }
 }

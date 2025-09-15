@@ -81,7 +81,7 @@ class BaseCrudController extends Controller
     {
         try {
             //devo
-            $validateData = $this->validateRequest($request);
+            $validateData = $this->validationRequest($request);
             $record = $this->model::create($validateData);
             return response()->json($record, 201);
         } catch (\Throwable $th) {
@@ -109,7 +109,7 @@ class BaseCrudController extends Controller
     public function update(Request $request, $id)
     {
         try {
-            $validateData = $this->validateRequest($request);
+            $validateData = $this->validationRequest($request);
             $record = $this->model::findOrFail($id);
             $record->update($validateData);
             return response()->json($record);
@@ -157,7 +157,7 @@ class BaseCrudController extends Controller
      *
      * @throws \Illuminate\Validation\ValidationException Si no existen reglas de validación o si la validación falla.
      */
-    protected function validateRequest(Request $request)
+    protected function validationRequest(Request $request)
     {
         if (empty($this->validationRules)) {
             throw ValidationException::withMessages(['error' => 'Reglas de validacion no definidas en el controlador hijo']);
@@ -165,8 +165,4 @@ class BaseCrudController extends Controller
         return $request->validate($this->validationRules);
     }
 
-    protected function afterStore($record, $validated)
-    {
-        // Por defecto no hace nada.
-    }
 }

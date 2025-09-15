@@ -48,10 +48,10 @@ class SaleService
 
     {
 
-        return  DB::transantion(function() use ($saleData){ 
+        return  DB::transaction(function() use ($saleData){ 
 
             try {
-                $sale = Sale::cretae([
+                $sale = Sale::create([
                     'user_id' => $saleData['user_id'],
                     'sale_date' => now(),
                     'sale_total' => 0,
@@ -78,14 +78,14 @@ class SaleService
                         'sale_id'=> $sale->id,
                         'product_id' => $productId,
                         'quantity_requested' => $quantityRequested,
-                        'subtotal_prive' => $subtotal,
+                        'subtotal_price' => $subtotal,
                     ]);
 
                     $this->deductFromProductionStock($productId, $quantityRequested);
 
                 }
 
-                $sale->updata(
+                $sale->update(
                     ['sale_total' => $totalSale]
                 );
 
