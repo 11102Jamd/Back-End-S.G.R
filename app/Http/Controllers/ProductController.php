@@ -4,26 +4,24 @@ namespace App\Http\Controllers;
 
 
 use Illuminate\Http\Request;
-
+use App\Models\Product;
 use App\Http\Controllers\globalCrud\BaseCrudController;
 
 
-class Product extends BaseCrudController
+class ProductController extends BaseCrudController
 {
     protected $model = Product::class;
     protected $validationRules = [
-        'produc_name' => 'required|string|max:255|unique:product,name',
+        'product_name' => 'required|string|max:255|unique:product,product_name',
         'unit_price' => 'required|numeric|min:0',
     ];
 
     public function index()
     {
         try {
-            $product = $this->model::with(['productProductions' => function ($query) {
-                $query->orderBy('id', 'desc')->take(1);
-            }, 'productProductions.production'])
+           $product = $this->model::with(['productProductions', 'productProductions.production'])
                 ->orderBy('id', 'desc')
-                ->first();
+                ->get();
 
             return response()->json($product);
         } catch (\Throwable $th) {

@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\Auth\AuthController;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\ProductController;
 
 Route::post('/login', [AuthController::class, 'login']);
 Route::post('/reset-password', [AuthController::class, 'resetPassword']);
@@ -36,3 +37,4 @@ Route::middleware('auth:sanctum')->group(function () {
         // Route::apiResource('purchase', PurchaseOrderController::class)->only(['index', 'store']);
     });
 });
+Route::apiResource('product', ProductController::class);
