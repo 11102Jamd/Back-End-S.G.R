@@ -21,7 +21,7 @@ class InputController extends BaseCrudController
     public function index()
     {
         try {
-            $inputs = $this->model::orderBy('id', 'desc')->get();
+            $inputs = $this->model::with(['batches'])->orderBy('id', 'desc')->get();
             return response()->json($inputs);
         } catch (\Throwable $th) {
             return response()->json([

@@ -22,9 +22,9 @@ class UserController extends BaseCrudController
      * @var array<string, string>
      */
     protected $validationRules = [
-        'name' => 'required|string|max:50',
+        'name1' => 'required|string|max:50',
         'name2' => 'required|string|max:20',
-        'surname' => 'required|string|max:20',
+        'surname1' => 'required|string|max:20',
         'surname2' => 'required|string|max:20',
         'email' => 'required|email|unique:users,email',
         'rol' => 'required|string|max:50',
