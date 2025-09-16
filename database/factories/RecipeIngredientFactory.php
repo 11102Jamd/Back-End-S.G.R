@@ -17,6 +17,7 @@ class RecipeIngredientFactory extends Factory
             'recipe_id' => Recipe::factory(),
             'input_id' => Input::factory(),
             'quantity_required' => $this->faker->randomFloat(3, 0.1, 10),
+            'unit_used' => $this->faker->randomElement(['ml', 'g']),
         ];
     }
 }

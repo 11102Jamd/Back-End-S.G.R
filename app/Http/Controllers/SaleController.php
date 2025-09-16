@@ -8,7 +8,7 @@ use App\Models\Sale;
 
 class SaleController extends BaseCrudController
 {
-    protected $moldel = Sale::class;
+    protected $model = Sale::class;
     protected $validationRules = [
         'user_id' => 'required|exists:users,id',
         'sale_date' => 'required|date',

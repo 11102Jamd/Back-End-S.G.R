@@ -7,9 +7,12 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use App\Models\Production;
 use App\Models\Product;
 use App\Models\Sale;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 class ProductProduction extends Model
 {
+    use HasFactory;
+
     protected $table = 'product_production';
 
     protected $fillable = [

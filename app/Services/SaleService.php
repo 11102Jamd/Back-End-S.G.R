@@ -10,7 +10,7 @@ use App\Models\Product;
 use App\Models\SaleProduct;
 
 
-class SaleService 
+class SaleService
 {
     private function getAvailableStockSafe(int $productId): float
     {
@@ -44,14 +44,13 @@ class SaleService
         }
     }
 
-    public function registerSale (array $saleData)
-
+    public function registerSale(array $saleData)
     {
 
-        return  DB::transantion(function() use ($saleData){ 
+        return  DB::transaction(function() use ($saleData){
 
             try {
-                $sale = Sale::cretae([
+                $sale = Sale::create([
                     'user_id' => $saleData['user_id'],
                     'sale_date' => now(),
                     'sale_total' => 0,
@@ -60,12 +59,12 @@ class SaleService
                 $totalSale = 0;
 
                 foreach ($saleData['products'] as $productData) {
-                    
+
                     $productId = $productData['product_id'];
                     $quantityRequested = $productData['quantity_requested'];
-                    
+
                     $availableStock = $this->getAvailableStockSafe($productId);
-                    
+
                     if ($availableStock < $quantityRequested) {
                         throw new \Exception("Stock insuficiente para el producto ID: {$productId}. Disponible: {$availableStock}, Requerido: {$quantityRequested}");
                     }
@@ -78,14 +77,14 @@ class SaleService
                         'sale_id'=> $sale->id,
                         'product_id' => $productId,
                         'quantity_requested' => $quantityRequested,
-                        'subtotal_prive' => $subtotal,
+                        'subtotal_price' => $subtotal,
                     ]);
 
                     $this->deductFromProductionStock($productId, $quantityRequested);
 
                 }
 
-                $sale->updata(
+                $sale->update(
                     ['sale_total' => $totalSale]
                 );
 
@@ -100,6 +99,6 @@ class SaleService
                 throw new \Exception('Error al procesar la venta: ' . $th->getMessage());
             }
         }) ;
-        
+
     }
 }

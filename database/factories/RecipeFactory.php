@@ -14,7 +14,6 @@ class RecipeFactory extends Factory
         return [
             'recipe_name' => $this->faker->words(3, true),
             'yield_quantity' => $this->faker->randomFloat(2, 1, 100),
-            'unit' => $this->faker->randomElement(['kg', 'L']),
         ];
     }
 }
