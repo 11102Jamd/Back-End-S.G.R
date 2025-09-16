@@ -7,12 +7,15 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 Use App\Models\User;
 Use App\Models\SaleProduct;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 class Sale extends Model
 {
-    protected $table = 'sale';
+    use HasFactory;
     
-    protected $fillable = 
+    protected $table = 'sale';
+
+    protected $fillable =
     [
         'user_id',
         'sale_date',

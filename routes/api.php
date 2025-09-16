@@ -101,6 +101,3 @@ Route::middleware(['auth:sanctum'])->group(function () {
 Route::post('/order/export-pdf', [OrderPdfController::class, 'exportPdf']);
 Route::post('/production/export-pdf', [ProductionPdfController::class, 'exportPdf']);
 Route::post('/sale/export-pdf', [SalePdfController::class, 'exportPdf']);
-
-
-Route::apiResource('sale', SaleController::class);

@@ -6,9 +6,12 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 Use App\Models\Sale;
 Use App\Models\Product;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 class SaleProduct extends Model
 {
+    use HasFactory;
+
     protected $table = 'sale_product';
 
     protected $fillable =
