@@ -6,7 +6,6 @@ use App\Http\Controllers\globalCrud\BaseCrudController;
 use Illuminate\Http\Request;
 use App\Models\Sale;
 
-//creo la clase SaleController que extiende de BaseCrudController
 class SaleController extends BaseCrudController
 {
     protected $model = Sale::class;
@@ -16,7 +15,6 @@ class SaleController extends BaseCrudController
         'sale_total' => 'nullable|numeric|min:0'
     ];
 
-    //constructor que inyecta la dependencia SaleService
     public function __construct(private \App\Services\SaleService $saleService) {}
 
     public function index()
@@ -35,7 +33,7 @@ class SaleController extends BaseCrudController
         }
     }
 
-    //metodo store para registrar una venta
+
     public function store(Request $request)
     {
         try {
@@ -49,7 +47,6 @@ class SaleController extends BaseCrudController
 
             $result = $this->saleService->registerSale($validated);
 
-            // Respuesta exitosa con detalles de la venta registrada
             return response()->json([
                 'success' => true,
                 'message' => $result['message'],
