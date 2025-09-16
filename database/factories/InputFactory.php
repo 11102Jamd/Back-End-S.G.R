@@ -21,7 +21,7 @@ class InputFactory extends Factory
             'name' => $this->faker->word(), //Nombre del insumo como palabra aleatoria
 
             //Selecciona aleatoriamente una unidad de medida entre las opciones especificadas
-            'unit' => $this->faker->randomElement(['kg', 'lb', 'l', 'un']) //Unidades de medida
+            'category' => $this->faker->randomElement(['liquido', 'solido_no_con', 'solido_con']) //Unidades de medida
         ];
     }
 }

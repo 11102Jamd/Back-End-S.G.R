@@ -2,6 +2,7 @@
 
 namespace Database\Factories;
 
+use App\Models\Input;
 use Illuminate\Database\Eloquent\Factories\Factory;
 use App\Models\InputBatch;
 use App\Models\Order;
@@ -27,9 +28,11 @@ class InputBatchFactory extends Factory
         //Crea un nuevo pedido asociado a este lote utilizando la fàbrica de Order
         return [
             'order_id' => Order::factory(),
-            'input_id' => 1,
+            'input_id' => Input::factory(),
             'quantity_total' => $this->faker->randomFloat(2, 1, 10),
+            'unit' => $this->faker->randomElement(['kg', 'g', 'l', 'ml', 'un']),
             'quantity_remaining' => $this->faker->randomFloat(2, 1, 10),
+            'unit_converted' => $this->faker->randomElement(['g', 'ml', 'un']),
             'unit_price' => $this->faker->randomFloat(2, 1, 100),
             'subtotal_price' => $this->faker->randomFloat(2, 10, 1000),
             'batch_number' => $this->faker->numberBetween(1, 100),
