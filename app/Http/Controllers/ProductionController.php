@@ -93,13 +93,14 @@ class ProductionController extends Controller
      * @param \Illuminate\Http\Request $request Datos de la producción
      * @return \Illuminate\Http\JsonResponse Datos de la producción o mensaje de error
      */
-    public function store(Request $request)
+    public function executeProduction(Request $request)
     {
+        $validated = $request->validate([
+            'recipe_id' => 'required|exists:recipe,id',
+            'quantity_to_produce' => 'required|numeric|min:0.001'
+        ]);
+
         try {
-            $validated = $request->validate([
-                'recipe_id' => 'required|exists:recipe,id',
-                'quantity_to_produce' => 'required|numeric|min:0.001'
-            ]);
             $production = $this->productionService->executeProduction(
                 $validated['recipe_id'],
                 $validated['quantity_to_produce']
