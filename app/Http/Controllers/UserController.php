@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Http\Controllers\globalCrud\BaseCrudController;
 use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class UserController extends BaseCrudController
 {
@@ -60,6 +61,13 @@ class UserController extends BaseCrudController
     {
         try {
             $user = $this->model::findOrFail($id);
+
+            if (Auth::id() == $id) {
+                return response()->json([
+                    'error' => 'Error usted no se puede inhabilitar asi mismo'
+                ], 403);
+            }
+
             $user->delete();//Ejecuta softdelete y no un delete como tal
             return response()->json([
                 'message' => 'usuario inhabilitado temporalmete',
