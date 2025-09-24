@@ -28,7 +28,9 @@ class ProductController extends BaseCrudController
     public function index()
     {
         try {
-            $product = $this->model::orderBy('id','desc')->get();
+            $product = $this->model::with(['productProductions', 'productProductions.production'])
+                ->OrderBy('id', 'desc')
+                ->get();
 
             return response()->json($product);
         } catch (\Throwable $th) {

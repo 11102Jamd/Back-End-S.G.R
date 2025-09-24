@@ -25,12 +25,10 @@ class DashboardController extends Controller
                 'sum_production' => Production::sum('total_cost'),
             ];
 
-            $stones = ($stats['sum_production'] + $stats['sum_orders']) - $stats['sum_sales'];
+            //$stones = ($stats['sum_production'] + $stats['sum_orders']) - $stats['sum_sales'];
 
-            return response()->json([
-                'generales' => $stats,
-                'ganancias' => $stones
-            ], 201);
+            return response()->json($stats,201);
+                //'ganancias' => $stones
         } catch (\Throwable $th) {
             return response()->json([
                 'error' => 'Error al obtener los datos generales de la panaderia',

@@ -33,6 +33,21 @@ class SaleController extends BaseCrudController
         }
     }
 
+    public function show($id)
+    {
+        try {
+            $sale = $this->model::with(['user', 'saleProducts.product'])
+                ->orderBy('id', 'desc')
+                ->findOrFail($id);
+
+            return response()->json($sale);
+        } catch (\Throwable $th) {
+            return response()->json([
+                'error' => 'No se encuentra la venta',
+                'message' => $th->getMessage()
+            ], 404);
+        }
+    }
 
     public function store(Request $request)
     {

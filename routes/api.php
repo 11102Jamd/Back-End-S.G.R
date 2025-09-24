@@ -29,16 +29,18 @@ Route::middleware(['auth:sanctum'])->group(function () {
     /**
      * Rutas basicas para el Dashboard
      */
+    Route::post('/order/export-pdf', [OrderPdfController::class, 'exportPdf']);
+    Route::post('/production/export-pdf', [ProductionPdfController::class, 'exportPdf']);
+    Route::post('/sale/export-pdf', [SalePdfController::class, 'exportPdf']);
     Route::prefix('dashboard')->group(function () {
         Route::get('/stats', [DashboardController::class, 'getDashboardStats']);
-        // Route::get('/sales-data', [DashboardController::class, 'getSalesData']);
-        // Route::get('/orders-data', [DashboardController::class, 'getOrdersData']);
-        // Route::get('/user-stats', [DashboardController::class, 'getUserStats']);
-        // Route::get('/top-products', [DashboardController::class, 'getTopProducts']);
-        // Route::get('/production-stats', [DashboardController::class, 'getProductionStats']);
+        Route::get('/sales-data', [DashboardController::class, 'getSalesData']);
+        Route::get('/orders-data', [DashboardController::class, 'getOrdersData']);
+        Route::get('/user-stats', [DashboardController::class, 'getUserStats']);
+        Route::get('/top-products', [DashboardController::class, 'getTopProducts']);
+        Route::get('/production-stats', [DashboardController::class, 'getProductionStats']);
         // Route::get('/inventory-value', [DashboardController::class, 'getInventoryValue']);
     });
-
     /**
      * Rutas especificas para el usuario Administrador
      */
@@ -97,17 +99,4 @@ Route::middleware(['auth:sanctum'])->group(function () {
     });
     Route::apiResource('input', InputController::class)->only(['index', 'show']);
     Route::apiResource('product', ProductController::class)->only(['index', 'show']);
-});
-
-Route::post('/order/export-pdf', [OrderPdfController::class, 'exportPdf']);
-Route::post('/production/export-pdf', [ProductionPdfController::class, 'exportPdf']);
-Route::post('/sale/export-pdf', [SalePdfController::class, 'exportPdf']);
-Route::prefix('dashboard')->group(function () {
-    Route::get('/stats', [DashboardController::class, 'getDashboardStats']);
-    Route::get('/sales-data', [DashboardController::class, 'getSalesData']);
-    Route::get('/orders-data', [DashboardController::class, 'getOrdersData']);
-    Route::get('/user-stats', [DashboardController::class, 'getUserStats']);
-    Route::get('/top-products', [DashboardController::class, 'getTopProducts']);
-    Route::get('/production-stats', [DashboardController::class, 'getProductionStats']);
-    // Route::get('/inventory-value', [DashboardController::class, 'getInventoryValue']);
 });
